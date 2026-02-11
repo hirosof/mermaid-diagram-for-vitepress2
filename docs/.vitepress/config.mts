@@ -1,10 +1,19 @@
 import { defineConfig } from 'vitepress'
+import { mermaidLang } from './syntaxhighlight/mermaid-lang' //ShikiのMermaid言語設定上書き用
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "mermaid-diagram-for-vitepress2",
   description: "VitePress2用のMermaid図描画コンポーネント",
   base: "/mermaid-diagram-for-vitepress2/",
+
+  markdown:{
+    shikiSetup(shiki) {
+      //ShikiのMermaid言語設定を上書きする
+      shiki.loadLanguage(mermaidLang)
+    }
+  },
+
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
