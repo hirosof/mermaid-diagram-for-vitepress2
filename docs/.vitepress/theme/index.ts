@@ -2,7 +2,12 @@
 import { h } from 'vue'
 import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
+
 import './style.css'
+
+//追加するコンポーネント読み込み
+import MermaidDiagramRenderer from '../components/MermaidDiagramRenderer/MermaidDiagramRenderer.vue'
+
 
 export default {
   extends: DefaultTheme,
@@ -13,5 +18,8 @@ export default {
   },
   enhanceApp({ app, router, siteData }) {
     // ...
+
+    //MermaidDiagramRendererの登録  
+    app.component("MermaidDiagramRenderer" , MermaidDiagramRenderer)
   }
 } satisfies Theme
