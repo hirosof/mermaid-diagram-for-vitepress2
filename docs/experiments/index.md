@@ -41,7 +41,7 @@ graph TD
 ### Claude Code Opus 4.6に作成してもらったサンプル
 
 ```mermaid {title='フローチャートサンプル'}
-flowchart TD
+flowchart LR
     A[開始] --> B{条件チェック}
     B -->|Yes| C[処理A実行]
     B -->|No| D[処理B実行]

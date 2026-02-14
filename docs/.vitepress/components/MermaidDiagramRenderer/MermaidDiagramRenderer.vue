@@ -294,42 +294,42 @@ function isShowDiagramTitle() {
     <div class="mdr-frame" :class="{ 'language-mermaid': isThisCodeGroupElement, 'active': (isCodeGroupFirstItem != null) }"
         ref="mdr_frame_container">
         <div class="mdr-innerFrame" :class="{ 'mdr-innerFrame-for-codegroup': isThisCodeGroupElement }">
-            <div class="mdf-header">
-                <div class="mdf-content-tab">
-                    <div class="mdf-content-tab-item"
-                        :class="{ 'mdf-content-tab-item-actived': currentContentType === 'Diagram' }"
+            <div class="mdr-header">
+                <div class="mdr-content-tab">
+                    <div class="mdr-content-tab-item"
+                        :class="{ 'mdr-content-tab-item-actived': currentContentType === 'Diagram' }"
                         @click="changeContentType('Diagram')">ダイアグラム</div>
-                    <div class="mdf-content-tab-item"
-                        :class="{ 'mdf-content-tab-item-actived': currentContentType === 'Code' }"
+                    <div class="mdr-content-tab-item"
+                        :class="{ 'mdr-content-tab-item-actived': currentContentType === 'Code' }"
                         @click="changeContentType('Code')">Mermaidコード</div>
                 </div>
 
-                <div class="mdf-icon-toolbar" v-if="false">
-                    <div class="mdf-icon-toolbar-button">⛶</div>
+                <div class="mdr-icon-toolbar" v-if="false">
+                    <div class="mdr-icon-toolbar-button">⛶</div>
                 </div>
             </div>
 
-            <div class="mdf-main">
+            <div class="mdr-main">
 
 
-                <div class="mdf-diagram-title" v-if="isShowDiagramTitle()">
+                <div class="mdr-diagram-title" v-if="isShowDiagramTitle()">
                     {{ title }}
                 </div>
 
-                <div class="mdf-diagram" v-html="DiagramData" v-if="currentContentType == 'Diagram'"
-                    :class="{ 'mdf-common-style-border-top': isShowDiagramTitle() }" />
+                <div class="mdr-diagram" v-html="DiagramData" v-if="currentContentType == 'Diagram'"
+                    :class="{ 'mdr-common-style-border-top': isShowDiagramTitle() }" />
 
-                <div class="mdf-code-block" v-html="MermaidHighlightedCode" v-if="currentContentType === 'Code'"
-                    :class="{ 'mdf-code-block-with-line-numbers': config.enableCodeLineNumbers, 'mdf-common-style-border-top': isShowDiagramTitle() }" />
+                <div class="mdr-code-block" v-html="MermaidHighlightedCode" v-if="currentContentType === 'Code'"
+                    :class="{ 'mdr-code-block-with-line-numbers': config.enableCodeLineNumbers, 'mdr-common-style-border-top': isShowDiagramTitle() }" />
 
             </div>
 
-            <div class="mdf-footer">
-                <div class="mdf-export-toolbar">
-                    <div class="mdf-export-toolbar-item" @click="downloadSvg()">↓ SVG</div>
-                    <div class="mdf-export-toolbar-item" @click="downloadPng(false)">↓ PNG</div>
-                    <div class="mdf-export-toolbar-item" @click="downloadPng(true)">↓ 透過PNG</div>
-                    <div class="mdf-export-toolbar-item" @click="copyMermaidCode()">{{ (mermaidCodeCopied) ? '✅' : '📋'
+            <div class="mdr-footer">
+                <div class="mdr-export-toolbar">
+                    <div class="mdr-export-toolbar-item" @click="downloadSvg()">↓ SVG</div>
+                    <div class="mdr-export-toolbar-item" @click="downloadPng(false)">↓ PNG</div>
+                    <div class="mdr-export-toolbar-item" @click="downloadPng(true)">↓ 透過PNG</div>
+                    <div class="mdr-export-toolbar-item" @click="copyMermaidCode()">{{ (mermaidCodeCopied) ? '✅' : '📋'
                         }} Mermaidコード</div>
                 </div>
             </div>
@@ -344,7 +344,7 @@ function isShowDiagramTitle() {
 <style scoped>
 /* 汎用 */
 
-.mdf-common-style-border-top {
+.mdr-common-style-border-top {
     margin-top: 5px;
     border-top: 1px solid v-bind('currentColorPallet?.borderColor');
 }
@@ -372,7 +372,7 @@ function isShowDiagramTitle() {
 
 /*ヘッダー */
 
-.mdf-header {
+.mdr-header {
     border-bottom: 1px solid v-bind('currentColorPallet?.borderColor');
     min-height: 30px;
     display: flex;
@@ -380,7 +380,7 @@ function isShowDiagramTitle() {
 
 /* コンテンツタブ */
 
-.mdf-content-tab {
+.mdr-content-tab {
     margin: 5px;
     border: 2px solid v-bind('currentColorPallet?.borderColor');
     display: flex;
@@ -388,38 +388,38 @@ function isShowDiagramTitle() {
     overflow: hidden;
 }
 
-.mdf-content-tab-item {
+.mdr-content-tab-item {
     padding: 5px 10px;
     text-align: center;
     border-right: 1px solid v-bind('currentColorPallet?.borderColor');
 }
 
-.mdf-content-tab-item:last-of-type {
+.mdr-content-tab-item:last-of-type {
     border-right: none;
 }
 
 
 
-.mdf-content-tab-item:hover {
+.mdr-content-tab-item:hover {
     background: v-bind('currentColorPallet?.tabItemHoverBackColor');
     color: v-bind('currentColorPallet?.tabItemHoverFrontColor');
     cursor: pointer;
 }
 
-.mdf-content-tab-item-actived {
+.mdr-content-tab-item-actived {
     background: v-bind('currentColorPallet?.tabActivedItemBackColor');
     color: v-bind('currentColorPallet?.tabActivedItemFrontColor');
 }
 
 /* ミニツールバー */
 
-.mdf-icon-toolbar {
+.mdr-icon-toolbar {
     display: flex;
     overflow: hidden;
     margin: 5px 5px 5px auto;
 }
 
-.mdf-icon-toolbar-button {
+.mdr-icon-toolbar-button {
     color: #000;
     min-width: 38px;
     padding: 5px 5px;
@@ -429,7 +429,7 @@ function isShowDiagramTitle() {
     border-radius: var(--mdr-border-radius-size);
 }
 
-.mdf-icon-toolbar-button:hover {
+.mdr-icon-toolbar-button:hover {
     background: v-bind('currentColorPallet?.tabItemHoverBackColor');
     color: v-bind('currentColorPallet?.tabItemHoverFrontColor');
     cursor: pointer;
@@ -437,7 +437,7 @@ function isShowDiagramTitle() {
 
 /* コンテンツ */
 
-.mdf-main {
+.mdr-main {
     margin: 5px 0;
     padding: 5px;
     min-height: 100px;
@@ -448,7 +448,7 @@ function isShowDiagramTitle() {
 
 /* タイトル */
 
-.mdf-diagram-title {
+.mdr-diagram-title {
 
     background: v-bind('currentColorPallet?.backColor');
     border-radius: var(--mdr-border-radius-size);
@@ -459,27 +459,26 @@ function isShowDiagramTitle() {
 
 /* ダイアグラム */
 
-.mdf-diagram {
+.mdr-diagram {
     padding: 5px;
     max-height: 500px;
     overflow: auto;
 }
-
 
 /* コードブロック */
 
-.mdf-code-block {
+.mdr-code-block {
     padding: 5px;
     max-height: 500px;
     overflow: auto;
 }
 
-.mdf-code-block :deep(pre) {
+.mdr-code-block :deep(pre) {
     margin: 0 !important;
     padding: 0% !important;
 }
 
-.mdf-code-block :deep(code) {
+.mdr-code-block :deep(code) {
     margin: 0 !important;
     padding: 0% !important;
     background: transparent;
@@ -487,11 +486,11 @@ function isShowDiagramTitle() {
 
 
 
-.mdf-code-block-with-line-numbers {
+.mdr-code-block-with-line-numbers {
     counter-reset: current_line_number v-bind(initCSSLineNumber);
 }
 
-.mdf-code-block-with-line-numbers :deep(.line)::before {
+.mdr-code-block-with-line-numbers :deep(.line)::before {
     display: inline-block;
     width: 2.5em;
     color: var(--vp-code-line-number-color);
@@ -504,7 +503,7 @@ function isShowDiagramTitle() {
 }
 
 /*フッター */
-.mdf-footer {
+.mdr-footer {
     border-top: 1px solid v-bind('currentColorPallet?.borderColor');
     min-height: 30px;
     display: flex;
@@ -513,7 +512,7 @@ function isShowDiagramTitle() {
 
 
 /* エクスポートツールバー */
-.mdf-export-toolbar {
+.mdr-export-toolbar {
     margin: 5px;
     border: 2px solid v-bind('currentColorPallet?.borderColor');
     display: flex;
@@ -522,18 +521,18 @@ function isShowDiagramTitle() {
     overflow: hidden;
 }
 
-.mdf-export-toolbar-item {
+.mdr-export-toolbar-item {
 
     padding: 5px 10px;
     text-align: center;
     border-right: 1px solid v-bind('currentColorPallet?.borderColor');
 }
 
-.mdf-export-toolbar-item:last-of-type {
+.mdr-export-toolbar-item:last-of-type {
     border-right: none;
 }
 
-.mdf-export-toolbar-item:hover {
+.mdr-export-toolbar-item:hover {
     background: v-bind('currentColorPallet?.tabItemHoverBackColor');
     color: v-bind('currentColorPallet?.tabItemHoverFrontColor');
     cursor: pointer;
