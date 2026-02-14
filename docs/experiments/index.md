@@ -40,7 +40,30 @@ graph TD
 
 ### Claude Code Opus 4.6に作成してもらったサンプル
 
-```mermaid {title='フローチャートサンプル'}
+::: code-group
+```mermaid [縦向き] {title='フローチャートサンプル'}
+flowchart TD
+    A[開始] --> B{条件チェック}
+    B -->|Yes| C[処理A実行]
+    B -->|No| D[処理B実行]
+    C --> E{結果判定}
+    D --> F[ログ出力]
+    F --> G[リトライ準備]
+    G --> B
+    E -->|成功| H[データ保存]
+    E -->|失敗| I[エラーハンドリング]
+    H --> J[通知送信]
+    I --> K{再試行可能?}
+    K -->|Yes| C
+    K -->|No| L[アラート発報]
+    J --> M[レポート生成]
+    L --> M
+    M --> N{追加処理あり?}
+    N -->|Yes| O[後続バッチ起動]
+    N -->|No| P[終了]
+    O --> P
+```
+```mermaid [横向き] {title='フローチャートサンプル'}
 flowchart LR
     A[開始] --> B{条件チェック}
     B -->|Yes| C[処理A実行]
@@ -62,7 +85,7 @@ flowchart LR
     N -->|No| P[終了]
     O --> P
 ```
-
+:::
 ## Deatilsでの使用
 
 ::: details 独自コンポーネント使用

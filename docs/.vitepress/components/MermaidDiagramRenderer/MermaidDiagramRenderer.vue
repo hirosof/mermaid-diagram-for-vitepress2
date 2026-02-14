@@ -23,7 +23,7 @@ let diagramGlobalCounter = 0
 import { ref, computed, onMounted, watch, nextTick, Ref } from 'vue'
 import { useData } from 'vitepress'
 import { MDRDefaultConfig, type MDRConfig } from './MDRConfig'
-import mermaid from 'mermaid';
+import mermaid, { SVG } from 'mermaid';
 
 
 // 属性の取得
@@ -146,8 +146,10 @@ const MermaidHighlightedCode = computed(() => decodeURIComponent(props.highlight
 */
 
 const DiagramID = ref('')
+const DiagramDrawTargetElement = ref<HTMLElement>();
 const MermaidCode = computed(() => decodeURIComponent(props.code))
 const DiagramData = ref('')
+const DiagramSize = ref<MDRSize>();
 
 
 async function renderDiagram() {
@@ -163,11 +165,78 @@ async function renderDiagram() {
     try {
         const data = await mermaid.render(DiagramID.value, MermaidCode.value);
         DiagramData.value = data.svg
+        DiagramSize.value = await getSVGSize(data.svg , null) || undefined;
     } catch (e) {
         DiagramData.value = `<pre style="color:red">Mermaid render error: ${e}</pre>`;
+        DiagramSize.value = undefined;
     }
 
+    setDiagramDrawTargetElementSize()
 }
+
+function setDiagramDrawTargetElementSize(){
+    if(DiagramDrawTargetElement.value){
+        DiagramDrawTargetElement.value.style.minWidth = ''+DiagramSize.value?.width + 'px'
+        DiagramDrawTargetElement.value.style.minHeight = ''+DiagramSize.value?.height + 'px'
+    }
+}
+
+watch(DiagramDrawTargetElement , () =>{
+    setDiagramDrawTargetElementSize();
+})
+
+/*
+
+    SVG Tool
+
+*/
+
+type MDRSize = {
+    width:number,
+    height:number
+}
+
+
+function getSVGSize(target_svg : string , areaSize : MDRSize | null) : MDRSize | null{
+
+    const parser = new DOMParser();
+    const top_element = parser.parseFromString(target_svg , 'image/svg+xml');
+    const svg_element = top_element.querySelector('svg');
+    if(!svg_element) return null;
+
+    let realAreaSize = areaSize;
+    if((DiagramDrawTargetElement !=null)&&(DiagramDrawTargetElement.value !=null)){
+        realAreaSize={
+            width : DiagramDrawTargetElement.value.clientWidth,
+            height : DiagramDrawTargetElement.value.clientHeight
+        }satisfies MDRSize;
+    }
+
+    if(!realAreaSize){
+        realAreaSize = {
+            width:800,
+            height:600
+        }satisfies MDRSize;
+    }
+
+    const viewBoxAttribute = svg_element.getAttribute('viewBox');
+
+    let width:number;
+    let height:number;
+
+    if(viewBoxAttribute != null){
+        const parts = viewBoxAttribute.split(/[\s,]+/)
+        width = parseFloat(parts[2]);
+        height = parseFloat(parts[3]);
+    }else{
+        width = parseFloat(svg_element.getAttribute('width') || realAreaSize.width.toString())
+        height = parseFloat(svg_element.getAttribute('height') || realAreaSize.height.toString())
+
+    }
+
+    return {width:width , height:height} satisfies MDRSize;
+}
+
 
 
 /*
@@ -183,26 +252,13 @@ function downloadSvg() {
 
 async function downloadPng(isTransparent : boolean) {
     if (!DiagramData.value) return
+    const svgSize = getSVGSize(DiagramData.value , {width:800 , height:600});
 
-    // SVG文字列からDOMParserで寸法を取得
-    const parser = new DOMParser()
-    const doc = parser.parseFromString(DiagramData.value, 'image/svg+xml')
-    const svgEl = doc.querySelector('svg')
-    if (!svgEl) return
+    if(!svgSize)return
 
     // viewBox or width/height から寸法を取得
-    let width: number
-    let height: number
-
-    const viewBox = svgEl.getAttribute('viewBox')
-    if (viewBox) {
-        const parts = viewBox.split(/[\s,]+/)
-        width = parseFloat(parts[2])
-        height = parseFloat(parts[3])
-    } else {
-        width = parseFloat(svgEl.getAttribute('width') || '800')
-        height = parseFloat(svgEl.getAttribute('height') || '600')
-    }
+    let width = svgSize.width;
+    let height  = svgSize.height;
 
     const scale = 2
     const canvas = document.createElement('canvas')
@@ -316,8 +372,11 @@ function isShowDiagramTitle() {
                     {{ title }}
                 </div>
 
-                <div class="mdr-diagram" v-html="DiagramData" v-if="currentContentType == 'Diagram'"
-                    :class="{ 'mdr-common-style-border-top': isShowDiagramTitle() }" />
+                <div class="mdr-diagram"  v-if="currentContentType == 'Diagram'" 
+                    :class="{ 'mdr-common-style-border-top': isShowDiagramTitle()}">
+                
+                    <div class="mdr-diagram-drawArea" v-html="DiagramData" ref="DiagramDrawTargetElement" />
+                </div>
 
                 <div class="mdr-code-block" v-html="MermaidHighlightedCode" v-if="currentContentType === 'Code'"
                     :class="{ 'mdr-code-block-with-line-numbers': config.enableCodeLineNumbers, 'mdr-common-style-border-top': isShowDiagramTitle() }" />
@@ -463,6 +522,11 @@ function isShowDiagramTitle() {
     padding: 5px;
     max-height: 500px;
     overflow: auto;
+}
+
+.mdr-diagram-drawArea{
+    padding: 0;
+    margin: 0;
 }
 
 /* コードブロック */
