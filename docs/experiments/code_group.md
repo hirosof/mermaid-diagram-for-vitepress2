@@ -2,7 +2,7 @@
 
 
 ::: code-group
-```mermaid bypass [バイパス]
+```mermaid [独自コンポーネント使用]
 graph TD
     A --> B
     C --> D
@@ -10,7 +10,7 @@ graph TD
     D --> E
     E --> F
 ```
-```mermaid [独自コンポーネント使用]
+```mermaid bypass [バイパス]
 graph TD
     A --> B
     C --> D

@@ -119,15 +119,16 @@ let colorPalletForDark:ColorPalletType = {
 let currentColorPallet : Ref<ColorPalletType | null> = ref(null)
 
 // テーマ切り替え時の処理
-function onChangeTheme() {
+
+async function onChangeTheme() {
     //モードに合わせてカラーパレット切り替え
     currentColorPallet.value = (isDark.value) ? colorPalletForDark : colorPalletForLight;
-
-
     renderDiagram()
 }
 
 
+
+const MermaidHighlightedCode = computed(()=>decodeURIComponent(props.highlightedCode))
 
 /*
 
@@ -199,7 +200,6 @@ function isShowDiagramTitle(){
                     <div class="mdf-content-tab-item" :class="{'mdf-content-tab-item-actived':currentContentType==='Diagram'}" @click="changeContentType('Diagram')">ダイアグラム</div>
                     <div class="mdf-content-tab-item" :class="{'mdf-content-tab-item-actived':currentContentType==='Code'}" @click="changeContentType('Code')">Mermaidコード</div>
                 </div>
-
                 
             </div>
 
@@ -214,7 +214,7 @@ function isShowDiagramTitle(){
                     
                 </div>
                 
-                <div class="mdf-code-block" v-html="decodeURIComponent(highlightedCode)" v-if="currentContentType==='Code'" :class="{
+                <div class="mdf-code-block" v-html="MermaidHighlightedCode" v-if="currentContentType==='Code'" :class="{
                     'mdf-code-block-with-line-numbers':config.enableCodeLineNumbers,
                     'mdf-common-style-border-top':isShowDiagramTitle()}">
 

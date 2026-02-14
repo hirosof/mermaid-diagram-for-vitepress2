@@ -15,7 +15,7 @@ export function MDRTokenInfoProcessor(info: string, content: string): MDRTokenIn
 
     const parsed = MCLSParser(info.trim())
 
-    if ((parsed) && ['mmd', 'mermaid'].includes(parsed.name)) {
+    if ((parsed) && ['mmd','mermaid'].includes(parsed.name)) {
 
         const bypass = (parsed.unnamedParameters.length > 0) && (parsed.unnamedParameters[0] == 'bypass')
 
