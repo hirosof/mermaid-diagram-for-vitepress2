@@ -143,11 +143,9 @@ flowchart TD
     O --> P
 ```
 
-
 ## コードグループ内での使用
 
 ::: code-group
-
 ```mermaid bypass [バイパス]
 graph TD
     A --> B
@@ -156,7 +154,6 @@ graph TD
     D --> E
     E --> F
 ```
-
 ```mermaid [独自コンポーネント使用]
 graph TD
     A --> B
@@ -165,13 +162,9 @@ graph TD
     D --> E
     E --> F
 ```
-
-
 :::
 
-
 ## Deatilsでの使用
-
 
 ### 独自コンポーネント使用
 

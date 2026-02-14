@@ -62,7 +62,8 @@ export default defineConfig({
       '/experiments/':[{
           text: '実験場',
           items:[
-            {text: 'トップ' , link:'/experiments/'},           
+            {text: 'トップ' , link:'/experiments/'},
+            {text:'コードブロック',link:'/experiments/code_group'}
           ]
         }
       ]      
