@@ -361,6 +361,20 @@ const isShowDiagramTitle = computed(()=>{
 })
 
 
+const isValidDiagramDownload = computed(()=>{
+    return DiagramData.value.length > 0;
+})
+
+const isValidMermaidCodeCopy = computed(()=>{
+    return MermaidCode.length > 0;
+})
+
+const isValidExportToolbar = computed(()=>{
+    return isValidDiagramDownload.value || isValidMermaidCodeCopy.value;
+});
+
+
+
 </script>
 
 
@@ -411,12 +425,12 @@ const isShowDiagramTitle = computed(()=>{
 
             </div>
 
-            <div class="mdr-footer">
+            <div class="mdr-footer" v-if="isValidExportToolbar">
                 <div class="mdr-export-toolbar">
-                    <div class="mdr-export-toolbar-item" @click="downloadSvg()">↓ SVG</div>
-                    <div class="mdr-export-toolbar-item" @click="downloadPng(false)">↓ PNG</div>
-                    <div class="mdr-export-toolbar-item" @click="downloadPng(true)">↓ 透過PNG</div>
-                    <div class="mdr-export-toolbar-item" @click="copyMermaidCode()">{{ (mermaidCodeCopied) ? '✅' : '📋'
+                    <div v-if="isValidDiagramDownload" class="mdr-export-toolbar-item" @click="downloadSvg()">↓ SVG</div>
+                    <div v-if="isValidDiagramDownload" class="mdr-export-toolbar-item" @click="downloadPng(false)">↓ PNG</div>
+                    <div v-if="isValidDiagramDownload" class="mdr-export-toolbar-item" @click="downloadPng(true)">↓ 透過PNG</div>
+                    <div v-if="isValidMermaidCodeCopy" class="mdr-export-toolbar-item" @click="copyMermaidCode()">{{ (mermaidCodeCopied) ? '✅' : '📋'
                         }} Mermaidコード</div>
                 </div>
             </div>
