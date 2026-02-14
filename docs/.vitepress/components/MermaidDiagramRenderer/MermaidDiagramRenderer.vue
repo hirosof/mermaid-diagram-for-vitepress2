@@ -13,6 +13,8 @@ MermaidDiagramRendererコンポーネント
 
 let diagramGlobalCounter = 0
 
+let isDarkForMermaidInitialized : boolean | null= null
+
 </script>
 
 <!--------------------------------------------------------------------
@@ -92,11 +94,10 @@ type ColorPalletType = {
     tabItemHoverFrontColor: string,
     tabActivedItemBackColor: string,
     tabActivedItemFrontColor: string,
-
 }
 
 //ライトモード時のカラーパレット
-let colorPalletForLight: ColorPalletType = {
+const colorPalletForLight: ColorPalletType = {
     backColor: "#00000020",
     frontColor: "#000",
     borderColor: "#00000020",
@@ -107,7 +108,7 @@ let colorPalletForLight: ColorPalletType = {
 }
 
 //ダークモード時のカラーパレット
-let colorPalletForDark: ColorPalletType = {
+const colorPalletForDark: ColorPalletType = {
     backColor: "#FFFFFF20",
     frontColor: "#FFF",
     borderColor: "#FFFFFF20",
@@ -118,12 +119,8 @@ let colorPalletForDark: ColorPalletType = {
 }
 
 
-
-
-
-
 // 現在のモードに合わせたカラーパレット
-let currentColorPallet: Ref<ColorPalletType | null> = ref(null)
+const currentColorPallet: Ref<ColorPalletType> = ref((isDark.value) ? colorPalletForDark : colorPalletForLight);
 
 // テーマ切り替え時の処理
 async function onChangeTheme() {
@@ -135,9 +132,9 @@ async function onChangeTheme() {
 
 
 /*
-    ハイライト済みMermeidコード
+    ハイライト済みMermaidコード
 */
-const MermaidHighlightedCode = computed(() => decodeURIComponent(props.highlightedCode))
+const MermaidHighlightedCode = decodeURIComponent(props.highlightedCode);
 
 /*
 
@@ -147,27 +144,39 @@ const MermaidHighlightedCode = computed(() => decodeURIComponent(props.highlight
 
 const DiagramID = ref('')
 const DiagramDrawTargetElement = ref<HTMLElement>();
-const MermaidCode = computed(() => decodeURIComponent(props.code))
+const MermaidCode = decodeURIComponent(props.code);
 const DiagramData = ref('')
 const DiagramSize = ref<MDRSize>();
+const MermaidException = ref('');
 
 
-async function renderDiagram() {
-
+async function InitializeMermaid(){
     mermaid.initialize({
         startOnLoad: false,
         theme: isDark.value ? 'dark' : 'default',
-        securityLevel: 'loose'
+        securityLevel: 'strict',
+        suppressErrorRendering:true
     })
+    isDarkForMermaidInitialized = isDark.value;
+}
 
-    DiagramID.value = `mermaid-diagramId-${diagramGlobalCounter++}`;
+async function renderDiagram() {
+
+    if((isDarkForMermaidInitialized==null)||(isDarkForMermaidInitialized !== isDark.value)){
+        await InitializeMermaid();
+    }
+
+    
+    if(DiagramData.value.length==0) DiagramID.value = `mermaid-diagramId-${diagramGlobalCounter++}`;
 
     try {
-        const data = await mermaid.render(DiagramID.value, MermaidCode.value);
+        const data = await mermaid.render(DiagramID.value, MermaidCode);
+        MermaidException.value = ""
         DiagramData.value = data.svg
         DiagramSize.value = await getSVGSize(data.svg , null) || undefined;
     } catch (e) {
-        DiagramData.value = `<pre style="color:red">Mermaid render error: ${e}</pre>`;
+        MermaidException.value = `${e}`;
+        DiagramData.value = "";
         DiagramSize.value = undefined;
     }
 
@@ -197,14 +206,14 @@ type MDRSize = {
 }
 
 
-function getSVGSize(target_svg : string , areaSize : MDRSize | null) : MDRSize | null{
+function getSVGSize(target_svg : string , areaSizeForFailedGotSVGRealSize : MDRSize | null) : MDRSize | null{
 
     const parser = new DOMParser();
     const top_element = parser.parseFromString(target_svg , 'image/svg+xml');
     const svg_element = top_element.querySelector('svg');
     if(!svg_element) return null;
 
-    let realAreaSize = areaSize;
+    let realAreaSize = areaSizeForFailedGotSVGRealSize;
     if((DiagramDrawTargetElement !=null)&&(DiagramDrawTargetElement.value !=null)){
         realAreaSize={
             width : DiagramDrawTargetElement.value.clientWidth,
@@ -256,33 +265,41 @@ async function downloadPng(isTransparent : boolean) {
 
     if(!svgSize)return
 
-    // viewBox or width/height から寸法を取得
-    let width = svgSize.width;
-    let height  = svgSize.height;
+    try{
+        // viewBox or width/height から寸法を取得
+        let width = svgSize.width;
+        let height  = svgSize.height;
 
-    const scale = 2
-    const canvas = document.createElement('canvas')
-    canvas.width = width * scale
-    canvas.height = height * scale
+        const scale = 2
+        const canvas = document.createElement('canvas')
+        canvas.width = width * scale
+        canvas.height = height * scale
 
-    const ctx = canvas.getContext('2d')!
-    ctx.scale(scale, scale)
+        const ctx = canvas.getContext('2d')
+        if(ctx){
+            ctx.scale(scale, scale)
 
-    if(!isTransparent){
-        ctx.fillStyle = (isDark.value) ? '#000' : '#FFF';
-        ctx.fillRect(0,0,canvas.width , canvas.height);
+            if(!isTransparent){
+                ctx.fillStyle = (isDark.value) ? '#000' : '#FFF';
+                ctx.fillRect(0,0,canvas.width , canvas.height);
+            }
+            const svgBase64 = btoa(unescape(encodeURIComponent(DiagramData.value)))
+            const dataUrl = `data:image/svg+xml;base64,${svgBase64}`
+
+            const img = new Image()
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, width, height)
+                canvas.toBlob((blob) => {
+                    if (blob) triggerDownload(blob, 'mermaid-diagram.png')
+                }, 'image/png')
+            }
+            img.src = dataUrl
+        }else{
+            throw ("2d Contextの取得に失敗しました");
+        }
+    }catch(e){
+        console.error("downloadPng Error ： " + e);
     }
-    const svgBase64 = btoa(unescape(encodeURIComponent(DiagramData.value)))
-    const dataUrl = `data:image/svg+xml;base64,${svgBase64}`
-
-    const img = new Image()
-    img.onload = () => {
-        ctx.drawImage(img, 0, 0, width, height)
-        canvas.toBlob((blob) => {
-            if (blob) triggerDownload(blob, 'mermaid-diagram.png')
-        }, 'image/png')
-    }
-    img.src = dataUrl
 }
 
 
@@ -305,14 +322,18 @@ const mermaidOriginalCode = decodeURIComponent(props.code);
 const mermaidCodeCopied = ref(false)
 
 async function copyMermaidCode() {
-    navigator.clipboard.writeText(mermaidOriginalCode)
 
-    mermaidCodeCopied.value = true;
+    try{
+        await navigator.clipboard.writeText(mermaidOriginalCode)
 
-    setTimeout(() => {
-        mermaidCodeCopied.value = false;
-    }, 2000);
+        mermaidCodeCopied.value = true;
 
+        setTimeout(() => {
+            mermaidCodeCopied.value = false;
+        }, 2000);
+    }catch(e){
+        console.error("copyMermaidCode Error : " + e);
+    }
 }
 
 
@@ -334,9 +355,10 @@ onMounted(() => {
 })
 
 
-function isShowDiagramTitle() {
+
+const isShowDiagramTitle = computed(()=>{
     return config.value.showDiagramTitle && (props.title.length > 0);
-}
+})
 
 
 </script>
@@ -360,6 +382,7 @@ function isShowDiagramTitle() {
                         @click="changeContentType('Code')">Mermaidコード</div>
                 </div>
 
+                <!--現在、未実装状態なので一旦非表示状態にしておく-->
                 <div class="mdr-icon-toolbar" v-if="false">
                     <div class="mdr-icon-toolbar-button">⛶</div>
                 </div>
@@ -368,18 +391,23 @@ function isShowDiagramTitle() {
             <div class="mdr-main">
 
 
-                <div class="mdr-diagram-title" v-if="isShowDiagramTitle()">
+                <div class="mdr-diagram-title" v-if="isShowDiagramTitle">
                     {{ title }}
                 </div>
 
                 <div class="mdr-diagram"  v-if="currentContentType == 'Diagram'" 
-                    :class="{ 'mdr-common-style-border-top': isShowDiagramTitle()}">
+                    :class="{ 'mdr-common-style-border-top': isShowDiagramTitle}">
                 
-                    <div class="mdr-diagram-drawArea" v-html="DiagramData" ref="DiagramDrawTargetElement" />
+                    <div class="mdr-diagram-drawArea" v-html="DiagramData" ref="DiagramDrawTargetElement" v-if="(DiagramData.length > 0)"/>
+
+                    <div class="mdr-diagram-drawArea" style="color:red" v-if="(DiagramData.length==0) && (MermaidException.length>0)">
+                        Mermaid render error : {{ MermaidException }}
+                    </div>
+
                 </div>
 
                 <div class="mdr-code-block" v-html="MermaidHighlightedCode" v-if="currentContentType === 'Code'"
-                    :class="{ 'mdr-code-block-with-line-numbers': config.enableCodeLineNumbers, 'mdr-common-style-border-top': isShowDiagramTitle() }" />
+                    :class="{ 'mdr-code-block-with-line-numbers': config.enableCodeLineNumbers, 'mdr-common-style-border-top': isShowDiagramTitle }" />
 
             </div>
 
@@ -499,7 +527,6 @@ function isShowDiagramTitle() {
 .mdr-main {
     margin: 5px 0;
     padding: 5px;
-    min-height: 100px;
     background: var(--vp-code-block-bg);
     border-radius: var(--mdr-border-radius-size);
 }
