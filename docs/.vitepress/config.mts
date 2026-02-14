@@ -25,7 +25,6 @@ export default defineConfig({
             tokens[idx].info = processed.newinfo_for_bypass;
             return defaultFence(tokens, idx, options, env, self)
           }
-          //console.log(processed.publish_MDRTag)
           return processed.publish_MDRTag
         }
         return defaultFence(tokens, idx, options, env, self)

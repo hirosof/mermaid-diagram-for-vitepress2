@@ -20,6 +20,8 @@ export function MDRTokenInfoProcessor(info: string, content: string): MDRTokenIn
         const bypass = (parsed.unnamedParameters.length > 0) && (parsed.unnamedParameters[0] == 'bypass')
 
         const line_numbers = MCLSParser_getNamedParameterValue(parsed.namedParameters, "start", "1")
+        const has_active_flag = parsed.unnamedParameters[parsed.unnamedParameters.length-1] == 'active';
+
         let highlight_line_ranges = MCLSParser_getNamedParameterValue(parsed.namedParameters, "highlight")
 
         if(highlight_line_ranges.length==0){
@@ -30,6 +32,8 @@ export function MDRTokenInfoProcessor(info: string, content: string): MDRTokenIn
         if (line_numbers.length > 0) newinfo_for_bypass += ":line-numbers=" + line_numbers
         if (highlight_line_ranges.length > 0)  newinfo_for_bypass += " {" + highlight_line_ranges + "}"
 
+        if(has_active_flag) newinfo_for_bypass += ' active'
+
 
         var diagram_title = MCLSParser_getNamedParameterValue(parsed.namedParameters , "title")
 
@@ -37,13 +41,17 @@ export function MDRTokenInfoProcessor(info: string, content: string): MDRTokenIn
         const highlightedHtml = highlightMermaidCode(content) // Shiki highlighterから直接ハイライト済みHTMLを生成
         const encodedHtml = encodeURIComponent(highlightedHtml)
          
-        const tag = `<MermaidDiagramRenderer 
+        let tag = `<MermaidDiagramRenderer 
             code="${encoded}"
             highlighted-code="${encodedHtml}"
             startLineNumbers="${line_numbers}"
-            title="${diagram_title}"
-        />`
+            title="${diagram_title}"`;
 
+        if(has_active_flag) tag+=" isCodeGroupFirstItem"
+        
+        tag+=`/>`
+
+        
         return {
             bypass : bypass,
             newinfo_for_bypass : newinfo_for_bypass,

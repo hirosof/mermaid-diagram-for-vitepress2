@@ -32,6 +32,7 @@ const props = defineProps<{
     highlightedCode: string
     startLineNumbers: string
     title: string
+    isCodeGroupFirstItem?:string
 }>()
 
 // テーマのデータを取得
@@ -160,8 +161,6 @@ async function renderDiagram(){
     
 }
 
-
-
 /*
 ------------------------------------------------------------------------
 汎用処理
@@ -192,7 +191,7 @@ function isShowDiagramTitle(){
 --------------------------------------------------------------------->
 <template>
     <!--フレーム-->
-    <div class="mdr-frame" :class="{'language-mermaid':isThisCodeGroupElement}" ref="mdr_frame_container">
+    <div class="mdr-frame" :class="{'language-mermaid':isThisCodeGroupElement , 'active':(isCodeGroupFirstItem!=null)}" ref="mdr_frame_container">
         <div class="mdr-innerFrame" :class="{'mdr-innerFrame-for-codegroup':isThisCodeGroupElement}">
             <div class="mdf-header">
 
