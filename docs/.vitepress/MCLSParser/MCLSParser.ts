@@ -196,9 +196,9 @@ export function MCLSParser(md_cb_lang_specified: string): MCLSParsedData | null 
         idx = endPoint
     }
 
-    const cs = current_str.trim()
-    if (cs.length > 0) unnamedParameters.push(cs)
-
+    const cs = current_str.trim();
+    if (cs.length > 0) unnamedParameters.push(cs);
+    
     return {
         name: unnamedParameters[0],
         unnamedParameters: unnamedParameters.toSpliced(0, 1),
