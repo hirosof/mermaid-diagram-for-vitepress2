@@ -181,7 +181,7 @@ function downloadSvg() {
 }
 
 
-async function downloadPng() {
+async function downloadPng(isTransparent : boolean) {
     if (!DiagramData.value) return
 
     // SVG文字列からDOMParserで寸法を取得
@@ -212,6 +212,10 @@ async function downloadPng() {
     const ctx = canvas.getContext('2d')!
     ctx.scale(scale, scale)
 
+    if(!isTransparent){
+        ctx.fillStyle = (isDark.value) ? '#000' : '#FFF';
+        ctx.fillRect(0,0,canvas.width , canvas.height);
+    }
     const svgBase64 = btoa(unescape(encodeURIComponent(DiagramData.value)))
     const dataUrl = `data:image/svg+xml;base64,${svgBase64}`
 
@@ -323,7 +327,8 @@ function isShowDiagramTitle() {
             <div class="mdf-footer">
                 <div class="mdf-export-toolbar">
                     <div class="mdf-export-toolbar-item" @click="downloadSvg()">↓ SVG</div>
-                    <div class="mdf-export-toolbar-item" @click="downloadPng()">↓ PNG</div>
+                    <div class="mdf-export-toolbar-item" @click="downloadPng(false)">↓ PNG</div>
+                    <div class="mdf-export-toolbar-item" @click="downloadPng(true)">↓ 透過PNG</div>
                     <div class="mdf-export-toolbar-item" @click="copyMermaidCode()">{{ (mermaidCodeCopied) ? '✅' : '📋'
                         }} Mermaidコード</div>
                 </div>
