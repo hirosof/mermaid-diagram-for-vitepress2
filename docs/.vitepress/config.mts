@@ -62,7 +62,9 @@ export default defineConfig({
           text: '実験場',
           items:[
             {text: 'トップ' , link:'/experiments/'},
-            {text:'コードグループ',link:'/experiments/code_group'}
+            {text:'バイパスモード',link:'/experiments/bypass_mode'},
+            {text:'コードグループ',link:'/experiments/code_group'},
+
           ]
         }
       ]      

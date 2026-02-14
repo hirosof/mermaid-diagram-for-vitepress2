@@ -4,7 +4,6 @@
 ## 独自コンポーネント使用
 
 
-
 ### タイトルなし
 
 ```mermaid
@@ -37,90 +36,11 @@ graph TD
 ```
 
 
-
-## バイパス使用
-
-### デフォルト
-```mermaid bypass
-graph TD
-    A --> B
-    C --> D
-    B --> E
-    D --> E
-    E --> F
-```
-
-### 行番号を10から始める
-
-```mermaid bypass [start:10]
-graph TD
-    A --> B
-    C --> D
-    B --> E
-    D --> E
-    E --> F
-```
-
-### 1行目をハイライトする
-
-```mermaid bypass [highlight:"1"]
-graph TD
-    A --> B
-    C --> D
-    B --> E
-    D --> E
-    E --> F
-```
-
-### 表示上の行番号を10から始め、3行目の行をハイライトする
-
-```mermaid bypass [start:10,highlight:"3"]
-graph TD
-    A --> B
-    C --> D
-    B --> E
-    D --> E
-    E --> F
-```
-
-### 3行目と5行目をハイライトする
-
-```mermaid bypass [highlight:"3,5"]
-graph TD
-    A --> B
-    C --> D
-    B --> E
-    D --> E
-    E --> F
-```
-
-### 3行目～5行目をハイライトする
-
-```mermaid bypass [highlight:"3-5"]
-graph TD
-    A --> B
-    C --> D
-    B --> E
-    D --> E
-    E --> F
-```
-
-### 1行目と3行目～5行目をハイライトする
-
-```mermaid bypass [highlight:"1,3-5"]
-graph TD
-    A --> B
-    C --> D
-    B --> E
-    D --> E
-    E --> F
-```
-
-
 ## AIに作成してもらったMermaidサンプル集
 
+### Claude Code Opus 4.6に作成してもらったサンプル
 
-```mermaid {title='[Claude Code Opus 4.6] フローチャートサンプル'}
+```mermaid {title='フローチャートサンプル'}
 flowchart TD
     A[開始] --> B{条件チェック}
     B -->|Yes| C[処理A実行]
@@ -145,26 +65,9 @@ flowchart TD
 
 ## Deatilsでの使用
 
-### 独自コンポーネント使用
-
 ::: details 独自コンポーネント使用
 
 ```mermaid
-graph TD
-    A --> B
-    C --> D
-    B --> E
-    D --> E
-    E --> F    
-```
-
-:::
-
-### バイパス
-
-::: details バイパス
-
-```mermaid bypass
 graph TD
     A --> B
     C --> D
