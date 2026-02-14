@@ -63,7 +63,7 @@ export default defineConfig({
           text: '実験場',
           items:[
             {text: 'トップ' , link:'/experiments/'},
-            {text:'コードブロック',link:'/experiments/code_group'}
+            {text:'コードグループ',link:'/experiments/code_group'}
           ]
         }
       ]      
