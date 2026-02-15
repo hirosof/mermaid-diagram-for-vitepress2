@@ -11,8 +11,6 @@ MermaidDiagramRendererコンポーネント
 --------------------------------------------------------------------->
 <script lang="ts">
 
-let diagramGlobalCounter = 0
-
 let isDarkForMermaidInitialized : boolean | null= null
 
 </script>
@@ -22,10 +20,10 @@ let isDarkForMermaidInitialized : boolean | null= null
 --------------------------------------------------------------------->
 <script setup lang="ts">
 
-import { ref, computed, onMounted, watch, nextTick, Ref } from 'vue'
+import { ref, computed, onMounted, watch, nextTick, Ref,useId } from 'vue'
 import { useData } from 'vitepress'
 import { MDRDefaultConfig, type MDRConfig } from './MDRConfig'
-import mermaid, { SVG } from 'mermaid';
+import mermaid from 'mermaid';
 
 
 // 属性の取得
@@ -52,6 +50,8 @@ const config = computed<MDRConfig>(() => ({
 内部変数(汎用)
 ------------------------------------------------------------------------
 */
+
+const SelfID = useId()
 
 const mdr_frame_container = ref<HTMLElement>();
 const isThisCodeGroupElement = ref<boolean>(false);
@@ -86,7 +86,7 @@ function changeContentType(type: ContentsType | null) {
 */
 
 //カラーパレットの型
-type ColorPalletType = {
+type ColorPaletteType = {
     backColor: string,
     frontColor: string,
     borderColor: string,
@@ -97,7 +97,7 @@ type ColorPalletType = {
 }
 
 //ライトモード時のカラーパレット
-const colorPalletForLight: ColorPalletType = {
+const colorPaletteForLight: ColorPaletteType = {
     backColor: "#00000020",
     frontColor: "#000",
     borderColor: "#00000020",
@@ -108,7 +108,7 @@ const colorPalletForLight: ColorPalletType = {
 }
 
 //ダークモード時のカラーパレット
-const colorPalletForDark: ColorPalletType = {
+const colorPaletteForDark: ColorPaletteType = {
     backColor: "#FFFFFF20",
     frontColor: "#FFF",
     borderColor: "#FFFFFF20",
@@ -120,12 +120,16 @@ const colorPalletForDark: ColorPalletType = {
 
 
 // 現在のモードに合わせたカラーパレット
-const currentColorPallet: Ref<ColorPalletType> = ref((isDark.value) ? colorPalletForDark : colorPalletForLight);
+const currentColorPallet= computed<ColorPaletteType>(()=>{
+    return (isDark.value) ? colorPaletteForDark : colorPaletteForLight;
+})
+
+
+//Ref<ColorPalletType> = ref((isDark.value) ? colorPalletForDark : colorPalletForLight);
 
 // テーマ切り替え時の処理
 async function onChangeTheme() {
-    //モードに合わせてカラーパレット切り替え
-    currentColorPallet.value = (isDark.value) ? colorPalletForDark : colorPalletForLight;
+    await InitializeMermaid();
     renderDiagram()
 }
 
@@ -138,12 +142,22 @@ const MermaidHighlightedCode = decodeURIComponent(props.highlightedCode);
 
 /*
 
-    ダイアグラム描画関連
+    ダイアグラム関連
 
 */
 
 const DiagramID = ref('')
+let   DiagramGeneratedNumber = 0;
 const DiagramDrawTargetElement = ref<HTMLElement>();
+
+const DiagramDrawTargetStyle = computed(()=>{
+    if(!DiagramSize.value) return {};
+    return {
+        minWidth : `${DiagramSize.value.width}px`,
+        minHeight : `${DiagramSize.value.height}px`
+    }
+})
+
 const MermaidCode = decodeURIComponent(props.code);
 const DiagramData = ref('')
 const DiagramSize = ref<MDRSize>();
@@ -162,37 +176,25 @@ async function InitializeMermaid(){
 
 async function renderDiagram() {
 
-    if((isDarkForMermaidInitialized==null)||(isDarkForMermaidInitialized !== isDark.value)){
+    if(isDarkForMermaidInitialized==null){
         await InitializeMermaid();
     }
 
-    
-    if(DiagramID.value.length==0) DiagramID.value = `mermaid-diagramId-${diagramGlobalCounter++}`;
+    DiagramID.value = `mermaid-diagramId-${SelfID}-${DiagramGeneratedNumber++}`;
 
     try {
         const data = await mermaid.render(DiagramID.value, MermaidCode);
         MermaidException.value = ""
         DiagramData.value = data.svg
-        DiagramSize.value = await getSVGSize(data.svg , null) || undefined;
+        DiagramSize.value = getSVGSize(data.svg , null) || undefined;
     } catch (e) {
         MermaidException.value = `${e}`;
         DiagramData.value = "";
         DiagramSize.value = undefined;
     }
-
-    setDiagramDrawTargetElementSize()
 }
 
-function setDiagramDrawTargetElementSize(){
-    if(DiagramDrawTargetElement.value){
-        DiagramDrawTargetElement.value.style.minWidth = ''+DiagramSize.value?.width + 'px'
-        DiagramDrawTargetElement.value.style.minHeight = ''+DiagramSize.value?.height + 'px'
-    }
-}
 
-watch(DiagramDrawTargetElement , () =>{
-    setDiagramDrawTargetElementSize();
-})
 
 /*
 
@@ -255,11 +257,11 @@ function getSVGSize(target_svg : string , areaSizeForFailedGotSVGRealSize : MDRS
 */
 function downloadSvg() {
     const blob = new Blob([DiagramData.value], { type: 'image/svg+xml;charset=utf-8' })
-    triggerDownload(blob, 'mermaid-diagram.svg')
+    triggerDownload(blob, `${DiagramID.value}.svg`)
 }
 
 
-async function downloadPng(isTransparent : boolean) {
+function downloadPng(isTransparent : boolean) {
     if (!DiagramData.value) return
     const svgSize = getSVGSize(DiagramData.value , {width:800 , height:600});
 
@@ -290,12 +292,12 @@ async function downloadPng(isTransparent : boolean) {
             img.onload = () => {
                 ctx.drawImage(img, 0, 0, width, height)
                 canvas.toBlob((blob) => {
-                    if (blob) triggerDownload(blob, 'mermaid-diagram.png')
+                    if (blob) triggerDownload(blob, `${DiagramID.value}.png`)
                 }, 'image/png')
             }
             img.src = dataUrl
         }else{
-            throw ("2d Contextの取得に失敗しました");
+            throw new Error ("2d Contextの取得に失敗しました");
         }
     }catch(e){
         console.error("downloadPng Error ： " + e);
@@ -308,7 +310,9 @@ function triggerDownload(blob: Blob, filename: string) {
     a.href = URL.createObjectURL(blob)
     a.download = filename
     a.click()
-    URL.revokeObjectURL(a.href)
+    setTimeout(() => {
+        URL.revokeObjectURL(a.href)   
+    }, 10000);
 }
 
 /*
@@ -318,13 +322,12 @@ function triggerDownload(blob: Blob, filename: string) {
 */
 
 
-const mermaidOriginalCode = decodeURIComponent(props.code);
 const mermaidCodeCopied = ref(false)
 
 async function copyMermaidCode() {
 
     try{
-        await navigator.clipboard.writeText(mermaidOriginalCode)
+        await navigator.clipboard.writeText(MermaidCode)
 
         mermaidCodeCopied.value = true;
 
@@ -411,7 +414,7 @@ const isValidExportToolbar = computed(()=>{
                 <div class="mdr-diagram"  v-if="currentContentType == 'Diagram'" 
                     :class="{ 'mdr-common-style-border-top': isShowDiagramTitle}">
                 
-                    <div class="mdr-diagram-drawArea" v-html="DiagramData" ref="DiagramDrawTargetElement" v-if="(DiagramData.length > 0)"/>
+                    <div class="mdr-diagram-drawArea" v-html="DiagramData" ref="DiagramDrawTargetElement" v-if="(DiagramData.length > 0)" :style="DiagramDrawTargetStyle"/>
 
                     <div class="mdr-diagram-drawArea" style="color:red" v-if="(DiagramData.length==0) && (MermaidException.length>0)">
                         Mermaid render error : {{ MermaidException }}
