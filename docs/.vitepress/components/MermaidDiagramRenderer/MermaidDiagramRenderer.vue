@@ -11,7 +11,7 @@ MermaidDiagramRendererコンポーネント
 --------------------------------------------------------------------->
 <script lang="ts">
 
-let isDarkForMermaidInitialized : boolean | null= null
+let IsMermaidInitializedInDarkMode : boolean | null= null
 
 </script>
 
@@ -124,9 +124,6 @@ const currentColorPallet= computed<ColorPaletteType>(()=>{
     return (isDark.value) ? colorPaletteForDark : colorPaletteForLight;
 })
 
-
-//Ref<ColorPalletType> = ref((isDark.value) ? colorPalletForDark : colorPalletForLight);
-
 // テーマ切り替え時の処理
 async function onChangeTheme() {
     await InitializeMermaid();
@@ -171,12 +168,12 @@ async function InitializeMermaid(){
         securityLevel: 'strict',
         suppressErrorRendering:true
     })
-    isDarkForMermaidInitialized = isDark.value;
+    IsMermaidInitializedInDarkMode = isDark.value;
 }
 
 async function renderDiagram() {
 
-    if(isDarkForMermaidInitialized==null){
+    if(IsMermaidInitializedInDarkMode==null){
         await InitializeMermaid();
     }
 
@@ -310,9 +307,8 @@ function triggerDownload(blob: Blob, filename: string) {
     a.href = URL.createObjectURL(blob)
     a.download = filename
     a.click()
-    setTimeout(() => {
-        URL.revokeObjectURL(a.href)   
-    }, 10000);
+    a.remove()
+    URL.revokeObjectURL(a.href)   
 }
 
 /*
