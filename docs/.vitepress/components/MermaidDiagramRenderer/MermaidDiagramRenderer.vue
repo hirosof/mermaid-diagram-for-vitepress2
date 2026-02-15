@@ -167,7 +167,7 @@ async function renderDiagram() {
     }
 
     
-    if(DiagramData.value.length==0) DiagramID.value = `mermaid-diagramId-${diagramGlobalCounter++}`;
+    if(DiagramID.value.length==0) DiagramID.value = `mermaid-diagramId-${diagramGlobalCounter++}`;
 
     try {
         const data = await mermaid.render(DiagramID.value, MermaidCode);
@@ -396,8 +396,7 @@ const isValidExportToolbar = computed(()=>{
                         @click="changeContentType('Code')">Mermaidコード</div>
                 </div>
 
-                <!--現在、未実装状態なので一旦非表示状態にしておく-->
-                <div class="mdr-icon-toolbar" v-if="false">
+                <div class="mdr-icon-toolbar">
                     <div class="mdr-icon-toolbar-button">⛶</div>
                 </div>
             </div>
@@ -521,7 +520,6 @@ const isValidExportToolbar = computed(()=>{
 }
 
 .mdr-icon-toolbar-button {
-    color: #000;
     min-width: 38px;
     padding: 5px 5px;
     margin: 0 5px;
