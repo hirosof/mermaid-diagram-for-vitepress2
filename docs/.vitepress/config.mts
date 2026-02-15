@@ -64,7 +64,8 @@ export default defineConfig({
             {text: 'トップ' , link:'/experiments/'},
             {text:'バイパスモード',link:'/experiments/bypass_mode'},
             {text:'コードグループ',link:'/experiments/code_group'},
-            {text:'Mermaidサンプル' , link:'/experiments/mermaid-samples-by-claude'}
+            {text:'MermaidサンプルA' , link:'/experiments/mermaid-samples-by-claude'},
+            {text:'MermaidサンプルB' , link:'/experiments/mermaid-large-samples-by-claude'}
 
           ]
         }

@@ -1,4 +1,4 @@
-# Mermaid サンプル集
+# Mermaid サンプル集A
 
 ::: info
 
