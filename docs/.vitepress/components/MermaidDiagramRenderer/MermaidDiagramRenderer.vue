@@ -406,7 +406,7 @@ const isValidExportToolbar = computed(()=>{
 
             </div>
 
-            <div class="mdr-operation-panel-frame">
+            <div class="mdr-operation-panel-frame" v-if="currentContentType == 'Diagram'">
 
                 <div class="mdr-operation-panel">
                     <div class="mdr-operation-panel-button" @click="EnableDrawAreaSizeFitByDiagramSize = !EnableDrawAreaSizeFitByDiagramSize">
