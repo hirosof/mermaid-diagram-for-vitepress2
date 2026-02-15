@@ -24,7 +24,6 @@ import { ref, computed, onMounted, watch, nextTick, Ref,useId } from 'vue'
 import { useData } from 'vitepress'
 import { MDRDefaultConfig, type MDRConfig } from './MDRConfig'
 import mermaid from 'mermaid';
-import { RefSymbol } from '@vue/reactivity';
 
 
 // 属性の取得
@@ -309,6 +308,12 @@ function downloadPng(isTransparent : boolean) {
     }
 }
 
+function downloadMermaidCodeFile(){
+   const blob = new Blob([MermaidCode], { type: 'text/vnd.mermaid' })
+    triggerDownload(blob, `${DiagramID.value}.mmd`)
+}
+
+
 
 function triggerDownload(blob: Blob, filename: string) {
     const a = document.createElement('a')
@@ -327,19 +332,28 @@ function triggerDownload(blob: Blob, filename: string) {
 
 
 const mermaidCodeCopied = ref(false)
-
 async function copyMermaidCode() {
-
     try{
         await navigator.clipboard.writeText(MermaidCode)
-
         mermaidCodeCopied.value = true;
-
         setTimeout(() => {
             mermaidCodeCopied.value = false;
         }, 2000);
     }catch(e){
         console.error("copyMermaidCode Error : " + e);
+    }
+}
+
+const mermaidSVGCopied = ref(false)
+async function copyMermaidSVG() {
+    try{
+        await navigator.clipboard.writeText(DiagramData.value)
+        mermaidSVGCopied.value = true;
+        setTimeout(() => {
+            mermaidSVGCopied.value = false;
+        }, 2000);
+    }catch(e){
+        console.error("copyMermaidSVG Error : " + e);
     }
 }
 
@@ -368,16 +382,16 @@ const isShowDiagramTitle = computed(()=>{
 })
 
 
-const isValidDiagramDownload = computed(()=>{
+const isValidDiagramData = computed(()=>{
     return DiagramData.value.length > 0;
 })
 
-const isValidMermaidCodeCopy = computed(()=>{
+const isValidMermaidCode = computed(()=>{
     return MermaidCode.length > 0;
 })
 
 const isValidExportToolbar = computed(()=>{
-    return isValidDiagramDownload.value || isValidMermaidCodeCopy.value;
+    return isValidDiagramData.value || isValidMermaidCode.value;
 });
 
 
@@ -440,12 +454,22 @@ const isValidExportToolbar = computed(()=>{
             </div>
 
             <div class="mdr-export-toolbar-frame" v-if="isValidExportToolbar">
+                <div class="mdr-export-toolbar-label">ダウンロード：</div>
                 <div class="mdr-export-toolbar">
-                    <div v-if="isValidDiagramDownload" class="mdr-export-toolbar-item" @click="downloadSvg()">↓ SVG</div>
-                    <div v-if="isValidDiagramDownload" class="mdr-export-toolbar-item" @click="downloadPng(false)">↓ PNG</div>
-                    <div v-if="isValidDiagramDownload" class="mdr-export-toolbar-item" @click="downloadPng(true)">↓ 透過PNG</div>
-                    <div v-if="isValidMermaidCodeCopy" class="mdr-export-toolbar-item" @click="copyMermaidCode()">{{ (mermaidCodeCopied) ? '✅' : '📋'
-                        }} Mermaidコード</div>
+                    <div v-if="isValidDiagramData" class="mdr-export-toolbar-item" @click="downloadSvg()">↓SVG</div>
+                    <div v-if="isValidDiagramData" class="mdr-export-toolbar-item" @click="downloadPng(false)">↓PNG</div>
+                    <div v-if="isValidDiagramData" class="mdr-export-toolbar-item" @click="downloadPng(true)">↓透過PNG</div>
+                    <div v-if="isValidMermaidCode" class="mdr-export-toolbar-item" @click="downloadMermaidCodeFile()">↓Mermaid</div>
+                </div>
+            </div>
+            <div class="mdr-export-toolbar-frame" v-if="isValidExportToolbar">
+                <div class="mdr-export-toolbar-label">コピー：</div>
+                <div class="mdr-export-toolbar">
+                    <div v-if="isValidDiagramData" class="mdr-export-toolbar-item" @click="copyMermaidSVG()">
+                         {{ (mermaidSVGCopied) ? '✅' : '📋' }} SVG
+                    </div>
+                    <div v-if="isValidMermaidCode" class="mdr-export-toolbar-item" @click="copyMermaidCode()">
+                        {{ (mermaidCodeCopied) ? '✅' : '📋' }} Mermaid</div>
                 </div>
             </div>
         </div>
@@ -579,7 +603,7 @@ const isValidExportToolbar = computed(()=>{
 
 .mdr-diagram {
     padding: 5px;
-    max-height: 500px;
+    max-height: 300px;
     overflow: auto;
 }
 
@@ -592,7 +616,7 @@ const isValidExportToolbar = computed(()=>{
 
 .mdr-code-block {
     padding: 5px;
-    max-height: 500px;
+    max-height: 300px;
     overflow: auto;
 }
 
@@ -632,11 +656,19 @@ const isValidExportToolbar = computed(()=>{
     border-top: 1px solid v-bind('currentColorPallet?.borderColor');
     min-height: 30px;
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+
+.mdr-export-toolbar-label{
+    text-align: left;
+    margin: auto 5px;
 }
 
 .mdr-export-toolbar {
-    margin: 5px;
+    margin: 5px 5px 5px auto;
     border: 2px solid v-bind('currentColorPallet?.borderColor');
     display: flex;
     justify-content: flex-end;
