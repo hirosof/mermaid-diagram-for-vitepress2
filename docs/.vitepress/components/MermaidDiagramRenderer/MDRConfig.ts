@@ -17,6 +17,8 @@ export type MDRConfig = {
     ShowTypeSwitchType : 'Tab' | 'Swap';
     enableCodeLineNumbers : boolean;
     showDiagramTitle:boolean;
+    DiagramMaxHeight:number;
+    CodeMaxHeight:number;
 }
 
 
@@ -30,7 +32,9 @@ export const MDRDefaultConfig :MDRConfig = {
     initShowType:'Diagram',
     enableCodeLineNumbers:true,
     showDiagramTitle:true,
-    ShowTypeSwitchType:'Tab'
+    ShowTypeSwitchType:'Tab',
+    DiagramMaxHeight:0,
+    CodeMaxHeight:0
 }
 
 

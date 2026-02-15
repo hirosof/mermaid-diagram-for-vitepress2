@@ -56,6 +56,8 @@ const SelfID = useId()
 const mdr_frame_container = ref<HTMLElement>();
 const isThisCodeGroupElement = ref<boolean>(false);
 const initCSSLineNumber = ref((props.startLineNumbers != null) ? Number(props.startLineNumbers) - 1 : 1)
+const DiagramMaxHeightStr = (config.value.DiagramMaxHeight != 0) ? config.value.DiagramMaxHeight+"px" : "none";
+const CodeMaxHeightStr = (config.value.CodeMaxHeight != 0) ? config.value.CodeMaxHeight+"px" : "none";
 
 
 /*
@@ -442,7 +444,10 @@ const isValidExportToolbar = computed(()=>{
                 </div>
 
                 <div class="mdr-diagram"  v-if="currentContentType == 'Diagram'" 
-                    :class="{ 'mdr-common-style-border-top': isShowDiagramTitle}">
+                    :class="{
+                        'mdr-common-style-border-top': isShowDiagramTitle,
+                        'mdr-diagram-max-height': (config.DiagramMaxHeight !=0)
+                    }">
                 
                     <div class="mdr-diagram-drawArea" v-html="DiagramData" ref="DiagramDrawTargetElement" v-if="(DiagramData.length > 0)" :style="DrawAreaSize"/>
 
@@ -453,7 +458,11 @@ const isValidExportToolbar = computed(()=>{
                 </div>
 
                 <div class="mdr-code-block" v-html="MermaidHighlightedCode" v-if="currentContentType === 'Code'"
-                    :class="{ 'mdr-code-block-with-line-numbers': config.enableCodeLineNumbers, 'mdr-common-style-border-top': isShowDiagramTitle }" />
+                    :class="{ 
+                        'mdr-code-block-with-line-numbers': config.enableCodeLineNumbers,
+                        'mdr-common-style-border-top': isShowDiagramTitle,
+                        'mdr-code-block-max-height' : (config.CodeMaxHeight != 0)
+                    }" />
 
             </div>
 
@@ -607,9 +616,15 @@ const isValidExportToolbar = computed(()=>{
 
 .mdr-diagram {
     padding: 5px;
-    max-height: 300px;
     overflow: auto;
 }
+
+
+.mdr-diagram-max-height{
+    max-height: v-bind(DiagramMaxHeightStr);
+}
+    
+
 
 .mdr-diagram-drawArea{
     padding: 0;
@@ -620,9 +635,13 @@ const isValidExportToolbar = computed(()=>{
 
 .mdr-code-block {
     padding: 5px;
-    max-height: 300px;
     overflow: auto;
 }
+
+.mdr-code-block-max-height{
+    max-height: v-bind(CodeMaxHeightStr);
+}
+
 
 .mdr-code-block :deep(pre) {
     margin: 0 !important;
