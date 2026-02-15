@@ -24,6 +24,7 @@ import { ref, computed, onMounted, watch, nextTick, Ref,useId } from 'vue'
 import { useData } from 'vitepress'
 import { MDRDefaultConfig, type MDRConfig } from './MDRConfig'
 import mermaid from 'mermaid';
+import { RefSymbol } from '@vue/reactivity';
 
 
 // 属性の取得
@@ -145,14 +146,21 @@ const MermaidHighlightedCode = decodeURIComponent(props.highlightedCode);
 
 const DiagramID = ref('')
 let   DiagramGeneratedNumber = 0;
+
 const DiagramDrawTargetElement = ref<HTMLElement>();
 
-const DiagramDrawTargetStyle = computed(()=>{
+const EnableDrawAreaSizeFitByDiagramSize = ref(true);
+const DrawAreaSizeForDiagramSizeMatch = computed(()=>{
     if(!DiagramSize.value) return {};
     return {
         minWidth : `${DiagramSize.value.width}px`,
         minHeight : `${DiagramSize.value.height}px`
     }
+})
+
+const DrawAreaSize = computed(()=>{
+    if(EnableDrawAreaSizeFitByDiagramSize.value) return {};
+    return DrawAreaSizeForDiagramSizeMatch.value;
 })
 
 const MermaidCode = decodeURIComponent(props.code);
@@ -373,7 +381,6 @@ const isValidExportToolbar = computed(()=>{
 });
 
 
-
 </script>
 
 
@@ -385,7 +392,9 @@ const isValidExportToolbar = computed(()=>{
     <div class="mdr-frame" :class="{ 'language-mermaid': isThisCodeGroupElement, 'active': (isCodeGroupFirstItem != null) }"
         ref="mdr_frame_container">
         <div class="mdr-innerFrame" :class="{ 'mdr-innerFrame-for-codegroup': isThisCodeGroupElement }">
-            <div class="mdr-header">
+
+            <!--コンテンツタブ-->
+            <div class="mdr-content-tab-frame">
                 <div class="mdr-content-tab">
                     <div class="mdr-content-tab-item"
                         :class="{ 'mdr-content-tab-item-actived': currentContentType === 'Diagram' }"
@@ -395,13 +404,20 @@ const isValidExportToolbar = computed(()=>{
                         @click="changeContentType('Code')">Mermaidコード</div>
                 </div>
 
-                <div class="mdr-icon-toolbar">
-                    <div class="mdr-icon-toolbar-button">⛶</div>
+            </div>
+
+            <div class="mdr-operation-panel-frame">
+
+                <div class="mdr-operation-panel">
+                    <div class="mdr-operation-panel-button" @click="EnableDrawAreaSizeFitByDiagramSize = !EnableDrawAreaSizeFitByDiagramSize">
+                        {{(EnableDrawAreaSizeFitByDiagramSize) ? "幅フィット解除" : "幅フィット"}}
+                    </div>
+                    <div class="mdr-operation-panel-button">⛶</div>
                 </div>
+
             </div>
 
             <div class="mdr-main">
-
 
                 <div class="mdr-diagram-title" v-if="isShowDiagramTitle">
                     {{ title }}
@@ -410,7 +426,7 @@ const isValidExportToolbar = computed(()=>{
                 <div class="mdr-diagram"  v-if="currentContentType == 'Diagram'" 
                     :class="{ 'mdr-common-style-border-top': isShowDiagramTitle}">
                 
-                    <div class="mdr-diagram-drawArea" v-html="DiagramData" ref="DiagramDrawTargetElement" v-if="(DiagramData.length > 0)" :style="DiagramDrawTargetStyle"/>
+                    <div class="mdr-diagram-drawArea" v-html="DiagramData" ref="DiagramDrawTargetElement" v-if="(DiagramData.length > 0)" :style="DrawAreaSize"/>
 
                     <div class="mdr-diagram-drawArea" style="color:red" v-if="(DiagramData.length==0) && (MermaidException.length>0)">
                         Mermaid render error : {{ MermaidException }}
@@ -423,7 +439,7 @@ const isValidExportToolbar = computed(()=>{
 
             </div>
 
-            <div class="mdr-footer" v-if="isValidExportToolbar">
+            <div class="mdr-export-toolbar-frame" v-if="isValidExportToolbar">
                 <div class="mdr-export-toolbar">
                     <div v-if="isValidDiagramDownload" class="mdr-export-toolbar-item" @click="downloadSvg()">↓ SVG</div>
                     <div v-if="isValidDiagramDownload" class="mdr-export-toolbar-item" @click="downloadPng(false)">↓ PNG</div>
@@ -469,15 +485,15 @@ const isValidExportToolbar = computed(()=>{
     margin: 5px;
 }
 
-/*ヘッダー */
 
-.mdr-header {
+
+/* コンテンツタブ */
+
+.mdr-content-tab-frame {
     border-bottom: 1px solid v-bind('currentColorPallet?.borderColor');
     min-height: 30px;
     display: flex;
 }
-
-/* コンテンツタブ */
 
 .mdr-content-tab {
     margin: 5px;
@@ -497,8 +513,6 @@ const isValidExportToolbar = computed(()=>{
     border-right: none;
 }
 
-
-
 .mdr-content-tab-item:hover {
     background: v-bind('currentColorPallet?.tabItemHoverBackColor');
     color: v-bind('currentColorPallet?.tabItemHoverFrontColor');
@@ -510,15 +524,22 @@ const isValidExportToolbar = computed(()=>{
     color: v-bind('currentColorPallet?.tabActivedItemFrontColor');
 }
 
-/* ミニツールバー */
+/* 操作パネル */
 
-.mdr-icon-toolbar {
+.mdr-operation-panel-frame {
+    border-bottom: 1px solid v-bind('currentColorPallet?.borderColor');
+    min-height: 30px;
+    display: flex;
+}
+
+
+.mdr-operation-panel {
     display: flex;
     overflow: hidden;
     margin: 5px 5px 5px auto;
 }
 
-.mdr-icon-toolbar-button {
+.mdr-operation-panel-button {
     min-width: 38px;
     padding: 5px 5px;
     margin: 0 5px;
@@ -527,7 +548,7 @@ const isValidExportToolbar = computed(()=>{
     border-radius: var(--mdr-border-radius-size);
 }
 
-.mdr-icon-toolbar-button:hover {
+.mdr-operation-panel-button:hover {
     background: v-bind('currentColorPallet?.tabItemHoverBackColor');
     color: v-bind('currentColorPallet?.tabItemHoverFrontColor');
     cursor: pointer;
@@ -604,16 +625,16 @@ const isValidExportToolbar = computed(()=>{
     border-right: 2px solid var(--vp-code-block-divider-color);
 }
 
-/*フッター */
-.mdr-footer {
+
+/* エクスポートツールバー */
+
+.mdr-export-toolbar-frame {
     border-top: 1px solid v-bind('currentColorPallet?.borderColor');
     min-height: 30px;
     display: flex;
     justify-content: flex-end;
 }
 
-
-/* エクスポートツールバー */
 .mdr-export-toolbar {
     margin: 5px;
     border: 2px solid v-bind('currentColorPallet?.borderColor');
