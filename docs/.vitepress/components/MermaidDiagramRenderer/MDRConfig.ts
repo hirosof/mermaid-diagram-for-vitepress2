@@ -13,13 +13,10 @@ import 'vitepress'
  * @typedef {MDRConfig}
  */
 export type MDRConfig = {
-    
     initShowType : 'Diagram' | 'Code';
-
+    ShowTypeSwitchType : 'Tab' | 'Swap';
     enableCodeLineNumbers : boolean;
-
     showDiagramTitle:boolean;
-
 }
 
 
@@ -32,7 +29,8 @@ export type MDRConfig = {
 export const MDRDefaultConfig :MDRConfig = {
     initShowType:'Diagram',
     enableCodeLineNumbers:true,
-    showDiagramTitle:true
+    showDiagramTitle:true,
+    ShowTypeSwitchType:'Tab'
 }
 
 

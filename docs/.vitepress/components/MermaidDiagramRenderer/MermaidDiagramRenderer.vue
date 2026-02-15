@@ -20,7 +20,7 @@ let IsMermaidInitializedInDarkMode : boolean | null= null
 --------------------------------------------------------------------->
 <script setup lang="ts">
 
-import { ref, computed, onMounted, watch, nextTick, Ref,useId } from 'vue'
+import { ref, computed, onMounted, watch, nextTick,useId } from 'vue'
 import { useData } from 'vitepress'
 import { MDRDefaultConfig, type MDRConfig } from './MDRConfig'
 import mermaid from 'mermaid';
@@ -212,7 +212,7 @@ type MDRSize = {
 }
 
 
-function getSVGSize(target_svg : string , areaSizeForFailedGotSVGRealSize : MDRSize | null) : MDRSize | null{
+function getSVGSize(target_svg : string , areaSizeForFailedGotSVGRealSize : MDRSize | null = null) : MDRSize | null{
 
     const parser = new DOMParser();
     const top_element = parser.parseFromString(target_svg , 'image/svg+xml');
@@ -267,7 +267,7 @@ function downloadSvg() {
 
 function downloadPng(isTransparent : boolean) {
     if (!DiagramData.value) return
-    const svgSize = getSVGSize(DiagramData.value , {width:800 , height:600});
+    const svgSize = getSVGSize(DiagramData.value);
 
     if(!svgSize)return
 
@@ -409,7 +409,7 @@ const isValidExportToolbar = computed(()=>{
 
             <!--コンテンツタブ-->
             <div class="mdr-content-tab-frame">
-                <div class="mdr-content-tab">
+                <div class="mdr-content-tab"  v-if="config.ShowTypeSwitchType=='Tab'">
                     <div class="mdr-content-tab-item"
                         :class="{ 'mdr-content-tab-item-actived': currentContentType === 'Diagram' }"
                         @click="changeContentType('Diagram')">ダイアグラム</div>
@@ -417,7 +417,11 @@ const isValidExportToolbar = computed(()=>{
                         :class="{ 'mdr-content-tab-item-actived': currentContentType === 'Code' }"
                         @click="changeContentType('Code')">Mermaidコード</div>
                 </div>
-
+                <div class="mdr-content-tab"  v-if="config.ShowTypeSwitchType=='Swap'">
+                    <div class="mdr-content-tab-item" @click="changeContentType(null)">
+                        🔃 {{ (currentContentType==='Code')? "ダイアグラム" :"Mermaidコード" }}表示へ切り替える
+                    </div>
+                </div>
             </div>
 
             <div class="mdr-operation-panel-frame" v-if="currentContentType == 'Diagram'">
