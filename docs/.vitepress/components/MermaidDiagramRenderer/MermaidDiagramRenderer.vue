@@ -643,7 +643,9 @@ const isValidExportToolbar = computed(()=>{
 
 .mdr-code-block-with-line-numbers :deep(.line)::before {
     display: inline-block;
-    width: 2.5em;
+    width: 50px;
+    overflow-x: hidden;
+    vertical-align: middle;
     color: var(--vp-code-line-number-color);
     text-align: right;
     margin-right: 5px;
