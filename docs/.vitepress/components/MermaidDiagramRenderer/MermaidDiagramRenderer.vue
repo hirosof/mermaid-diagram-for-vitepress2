@@ -164,6 +164,9 @@ const DrawAreaSize = computed(()=>{
     return DrawAreaSizeForDiagramSizeMatch.value;
 })
 
+
+const EnableDiagramDrawAreaMaxSize = ref(true);
+
 const MermaidCode = decodeURIComponent(props.code);
 const DiagramData = ref('')
 const DiagramSize = ref<MDRSize>();
@@ -201,6 +204,11 @@ async function renderDiagram() {
 }
 
 
+/*
+    コードブロック
+*/
+
+const EnableCodeBlockAreaMaxSize = ref(true);
 
 /*
 
@@ -426,13 +434,28 @@ const isValidExportToolbar = computed(()=>{
                 </div>
             </div>
 
-            <div class="mdr-operation-panel-frame" v-if="currentContentType == 'Diagram'">
+            <div class="mdr-operation-panel-frame" v-if="(currentContentType == 'Diagram')">
+
 
                 <div class="mdr-operation-panel">
+                    <div class="mdr-operation-panel-button" @click="EnableDiagramDrawAreaMaxSize = !EnableDiagramDrawAreaMaxSize" v-if="config.DiagramMaxHeight != 0">
+                        高さ制限{{ EnableDiagramDrawAreaMaxSize?'解除':'設定' }}
+                    </div>
                     <div class="mdr-operation-panel-button" @click="EnableDrawAreaSizeFitByDiagramSize = !EnableDrawAreaSizeFitByDiagramSize">
                         {{(EnableDrawAreaSizeFitByDiagramSize) ? "幅フィット解除" : "幅フィット"}}
                     </div>
                     <div class="mdr-operation-panel-button">⛶</div>
+                </div>
+
+            </div>
+
+            <div class="mdr-operation-panel-frame" v-if="(currentContentType == 'Code') && (config.CodeMaxHeight != 0)">
+
+                <div class="mdr-operation-panel">
+                    <div class="mdr-operation-panel-button" @click="EnableCodeBlockAreaMaxSize = !EnableCodeBlockAreaMaxSize">
+                        高さ制限{{ EnableCodeBlockAreaMaxSize?'解除':'設定' }}
+                    </div>
+
                 </div>
 
             </div>
@@ -446,7 +469,7 @@ const isValidExportToolbar = computed(()=>{
                 <div class="mdr-diagram"  v-if="currentContentType == 'Diagram'" 
                     :class="{
                         'mdr-common-style-border-top': isShowDiagramTitle,
-                        'mdr-diagram-max-height': (config.DiagramMaxHeight !=0)
+                        'mdr-diagram-max-height': (config.DiagramMaxHeight !=0) && EnableDiagramDrawAreaMaxSize
                     }">
                 
                     <div class="mdr-diagram-drawArea" v-html="DiagramData" ref="DiagramDrawTargetElement" v-if="(DiagramData.length > 0)" :style="DrawAreaSize"/>
@@ -461,7 +484,7 @@ const isValidExportToolbar = computed(()=>{
                     :class="{ 
                         'mdr-code-block-with-line-numbers': config.enableCodeLineNumbers,
                         'mdr-common-style-border-top': isShowDiagramTitle,
-                        'mdr-code-block-max-height' : (config.CodeMaxHeight != 0)
+                        'mdr-code-block-max-height' : (config.CodeMaxHeight != 0) && EnableCodeBlockAreaMaxSize
                     }" />
 
             </div>

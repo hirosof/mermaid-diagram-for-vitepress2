@@ -33,8 +33,8 @@ export const MDRDefaultConfig :MDRConfig = {
     enableCodeLineNumbers:true,
     showDiagramTitle:true,
     ShowTypeSwitchType:'Tab',
-    DiagramMaxHeight:0,
-    CodeMaxHeight:0
+    DiagramMaxHeight:300,
+    CodeMaxHeight:300
 }
 
 
