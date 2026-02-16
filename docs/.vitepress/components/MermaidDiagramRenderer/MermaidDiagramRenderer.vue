@@ -67,7 +67,7 @@ const CodeMaxHeightStr = (config.value.CodeMaxHeight != 0) ? config.value.CodeMa
 */
 
 type ContentsType = "Diagram" | "Code";
-const currentContentType = ref<ContentsType>((config.value.initShowType == 'Diagram') ? 'Diagram' : 'Code');
+const currentContentType = ref<ContentsType>((config.value.InitShowType == 'Diagram') ? 'Diagram' : 'Code');
 function changeContentType(type: ContentsType | null) {
     if (!type) {
         if (currentContentType.value === 'Diagram') {
@@ -209,6 +209,7 @@ async function renderDiagram() {
 */
 
 const EnableCodeBlockAreaMaxSize = ref(true);
+const ShowCodeBlockLineNumbers = ref(config.value.InitShowCodeLineNumbers)
 
 /*
 
@@ -388,7 +389,7 @@ onMounted(() => {
 
 
 const isShowDiagramTitle = computed(()=>{
-    return config.value.showDiagramTitle && (props.title.length > 0);
+    return config.value.ShowDiagramTitle && (props.title.length > 0);
 })
 
 
@@ -452,6 +453,9 @@ const isValidExportToolbar = computed(()=>{
             <div class="mdr-operation-panel-frame" v-if="(currentContentType == 'Code') && (config.CodeMaxHeight != 0)">
 
                 <div class="mdr-operation-panel">
+                     <div class="mdr-operation-panel-button" @click="ShowCodeBlockLineNumbers = !ShowCodeBlockLineNumbers">
+                        行番号を{{ ShowCodeBlockLineNumbers ? '隠す' : '表示する'}}
+                    </div>                   
                     <div class="mdr-operation-panel-button" @click="EnableCodeBlockAreaMaxSize = !EnableCodeBlockAreaMaxSize">
                         高さ制限{{ EnableCodeBlockAreaMaxSize?'解除':'設定' }}
                     </div>
@@ -482,7 +486,7 @@ const isValidExportToolbar = computed(()=>{
 
                 <div class="mdr-code-block" v-html="MermaidHighlightedCode" v-if="currentContentType === 'Code'"
                     :class="{ 
-                        'mdr-code-block-with-line-numbers': config.enableCodeLineNumbers,
+                        'mdr-code-block-with-line-numbers': ShowCodeBlockLineNumbers,
                         'mdr-common-style-border-top': isShowDiagramTitle,
                         'mdr-code-block-max-height' : (config.CodeMaxHeight != 0) && EnableCodeBlockAreaMaxSize
                     }" />
@@ -492,10 +496,10 @@ const isValidExportToolbar = computed(()=>{
             <div class="mdr-export-toolbar-frame" v-if="isValidExportToolbar">
                 <div class="mdr-export-toolbar-label">ダウンロード：</div>
                 <div class="mdr-export-toolbar">
-                    <div v-if="isValidDiagramData" class="mdr-export-toolbar-item" @click="downloadSvg()">↓SVG</div>
-                    <div v-if="isValidDiagramData" class="mdr-export-toolbar-item" @click="downloadPng(false)">↓PNG</div>
-                    <div v-if="isValidDiagramData" class="mdr-export-toolbar-item" @click="downloadPng(true)">↓透過PNG</div>
-                    <div v-if="isValidMermaidCode" class="mdr-export-toolbar-item" @click="downloadMermaidCodeFile()">↓Mermaid</div>
+                    <div v-if="isValidDiagramData" class="mdr-export-toolbar-item" @click="downloadSvg()">SVG</div>
+                    <div v-if="isValidDiagramData" class="mdr-export-toolbar-item" @click="downloadPng(false)">PNG</div>
+                    <div v-if="isValidDiagramData" class="mdr-export-toolbar-item" @click="downloadPng(true)">透過PNG</div>
+                    <div v-if="isValidMermaidCode" class="mdr-export-toolbar-item" @click="downloadMermaidCodeFile()">Mermaidコード</div>
                 </div>
             </div>
             <div class="mdr-export-toolbar-frame" v-if="isValidExportToolbar">
@@ -505,7 +509,7 @@ const isValidExportToolbar = computed(()=>{
                          {{ (mermaidSVGCopied) ? '✅' : '📋' }} SVG
                     </div>
                     <div v-if="isValidMermaidCode" class="mdr-export-toolbar-item" @click="copyMermaidCode()">
-                        {{ (mermaidCodeCopied) ? '✅' : '📋' }} Mermaid</div>
+                        {{ (mermaidCodeCopied) ? '✅' : '📋' }} Mermaidコード</div>
                 </div>
             </div>
         </div>
