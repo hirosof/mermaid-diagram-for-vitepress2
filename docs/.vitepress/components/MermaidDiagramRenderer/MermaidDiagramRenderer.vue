@@ -526,7 +526,7 @@ const isValidExportToolbar = computed(()=>{
 
 /* フレーム */
 .mdr-frame {
-    margin: 5px 0;
+    margin: 15px 0;
     --mdr-border-radius-size: 10px;
 }
 
