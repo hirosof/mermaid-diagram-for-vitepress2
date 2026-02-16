@@ -577,11 +577,20 @@ const isValidExportToolbar = computed(()=>{
     border-right: none;
 }
 
-.mdr-content-tab-item:hover {
+@media (hover: hover){
+    .mdr-content-tab-item:hover {
+        background: v-bind('currentColorPallet?.tabItemHoverBackColor');
+        color: v-bind('currentColorPallet?.tabItemHoverFrontColor');
+        cursor: pointer;
+    }
+}
+
+.mdr-content-tab-item:active {
     background: v-bind('currentColorPallet?.tabItemHoverBackColor');
     color: v-bind('currentColorPallet?.tabItemHoverFrontColor');
     cursor: pointer;
 }
+
 
 .mdr-content-tab-item-actived {
     background: v-bind('currentColorPallet?.tabActivedItemBackColor');
@@ -612,7 +621,15 @@ const isValidExportToolbar = computed(()=>{
     border-radius: var(--mdr-border-radius-size);
 }
 
-.mdr-operation-panel-button:hover {
+@media (hover: hover){
+    .mdr-operation-panel-button:hover {
+        background: v-bind('currentColorPallet?.tabItemHoverBackColor');
+        color: v-bind('currentColorPallet?.tabItemHoverFrontColor');
+        cursor: pointer;
+    }
+}
+
+.mdr-operation-panel-button:active {
     background: v-bind('currentColorPallet?.tabItemHoverBackColor');
     color: v-bind('currentColorPallet?.tabItemHoverFrontColor');
     cursor: pointer;
@@ -739,7 +756,15 @@ const isValidExportToolbar = computed(()=>{
     border-right: none;
 }
 
-.mdr-export-toolbar-item:hover {
+@media (hover: hover){
+    .mdr-export-toolbar-item:hover {
+        background: v-bind('currentColorPallet?.tabItemHoverBackColor');
+        color: v-bind('currentColorPallet?.tabItemHoverFrontColor');
+        cursor: pointer;
+    }
+}
+
+.mdr-export-toolbar-item:active {
     background: v-bind('currentColorPallet?.tabItemHoverBackColor');
     color: v-bind('currentColorPallet?.tabItemHoverFrontColor');
     cursor: pointer;
