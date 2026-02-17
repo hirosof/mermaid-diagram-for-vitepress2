@@ -632,13 +632,41 @@ const isValidExport = computed(()=>{
     <Teleport to="body">
         <div class="mdr-fullscreen-overlay" v-if="visibleFullScreen" ontouchstart="">
             <div class="mdr-fullscreen-wall">
-                <div class="mdr-fullscreen-system-buttons-frame">
-                   <div class="mdr-fullscreen-system-buttons-panel">
-                    <div class="mdr-fullscreen-system-button" @click="closeFullScreen();">
-                        閉じる
-                    </div>  
-                </div> 
-             </div>
+                <div class="mdr-fullscreen-general-menu-frame">
+                    <ul class="mdr-fullscreen-general-menu mdr-fullscreen-system-menu">
+                        <li @click="closeFullScreen()">
+                            閉じる
+                        </li>
+                    </ul>
+                </div>
+                <div class="mdr-fullscreen-general-menu-frame">
+                    <ul class="mdr-fullscreen-general-menu mdr-fullscreen-operation-menu">
+                        <li>
+                            最小
+                        </li>
+                        <li >
+                            縮小
+                        </li>
+                        <li >
+                            XXX %
+                        </li>
+                        <li >
+                            拡大
+                        </li>
+                        <li>
+                            最大
+                        </li>
+                    </ul>
+                </div>
+                <div class="mdr-fullscreen-contents-frame">
+
+                    <div class="mdr-fullscreen-contents-area">
+
+                    </div>
+
+
+                </div>
+
 
 
             </div>
@@ -929,24 +957,24 @@ const isValidExport = computed(()=>{
 
 .mdr-fullscreen-overlay{
     --mdr-border-radius-size: 10px;
-
     position: fixed;
     z-index: 9999;
     display: flex;
     align-items: center;
     justify-content: center;
     background: v-bind('currentColorPallet.overlayBackColor');
+    color: v-bind('currentColorPallet?.frontColor');
     inset: 0;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     overflow: hidden;
 }
 
 .mdr-fullscreen-wall{
-    --mdr-safearea-width:calc(env(safe-area-inset-left) + env(safe-area-inset-right));
-    --mdr-safearea-height:calc(env(safe-area-inset-top) + env(safe-area-inset-bottom));
 
-    width: 95vw;
+    width: 98vw;
     height: 95vh;
+    max-width: 98vw;
+    max-height: 95vh;
     
     margin: 0;
     padding: 5px;
@@ -954,49 +982,81 @@ const isValidExport = computed(()=>{
     border: 2px solid v-bind('currentColorPallet?.borderColor');
     border-radius: var(--mdr-border-radius-size);
     overflow: hidden;
-    display: block;
+    display: flex;
+    flex-direction: column;
 
     /* dvw , dvh 対応環境用 */
-    width: 95dvw;
+    width: 98dvw;
     height: 95dvh; 
+    max-width: 98dvw;
+    max-height: 95dvh;
 }
 
-.mdr-fullscreen-system-buttons-frame{
+.mdr-fullscreen-general-menu-frame {
+    padding: 0px;
     border-bottom: 1px solid v-bind('currentColorPallet?.borderColor');
-    min-height: 30px;
-    display: flex;
 }
 
-.mdr-fullscreen-system-buttons-panel{
+
+.mdr-fullscreen-general-menu{
+    margin: 2.5px;
+    padding: 2.5px;
     display: flex;
-    overflow: hidden;
-    margin: 5px 5px 5px auto;
+    align-items: center;
+    vertical-align: middle;
 }
 
-.mdr-fullscreen-system-button{
-    display: block;
-    min-width: 100px;
-    padding: 5px 5px;
-    margin: 0 5px;
+.mdr-fullscreen-general-menu li{
+    margin: 0 2.5px;
+    padding: 10px 5px;
     text-align: center;
-    overflow: hidden;
+    min-width: 64px;
+    line-height: 25px;
+    background: v-bind('currentColorPallet.backColor2');
     border: 2px solid v-bind('currentColorPallet?.borderColor');
     border-radius: var(--mdr-border-radius-size);
 }
 
+
 @media (hover: hover){
-    .mdr-fullscreen-system-button:hover {
+    .mdr-fullscreen-general-menu li:hover {
         background: v-bind('currentColorPallet?.itemHoverBackColor');
         color: v-bind('currentColorPallet?.itemHoverFrontColor');
         cursor: pointer;
     }
 }
-
-.mdr-fullscreen-system-button:active {
+.mdr-fullscreen-general-menu li:active {
     background: v-bind('currentColorPallet?.itemHoverBackColor');
     color: v-bind('currentColorPallet?.itemHoverFrontColor');
     cursor: pointer;
 }
+
+
+.mdr-fullscreen-system-menu{
+    justify-content: flex-end;    
+}
+
+.mdr-fullscreen-operation-menu{
+    justify-content: center;    
+}
+
+
+.mdr-fullscreen-contents-frame{
+    flex:1;
+    margin-top: 5px;
+    background: var(--vp-code-block-bg);
+    border-radius: var(--mdr-border-radius-size);
+    overflow: auto;
+    padding: 5px;
+}
+
+
+.mdr-fullscreen-contents-area{
+    /* 以下の設定はダミーです */
+    width: 3000px;
+    height: 2000px;
+}
+
 
 
 </style>
