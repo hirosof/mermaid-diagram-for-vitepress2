@@ -111,6 +111,7 @@ function changeContentType(type: ContentsType | null) {
 type ColorPaletteType = {
     backColor: string,
     backColor2: string,
+    overlayBackColor:string,
     frontColor: string,
     borderColor: string,
     itemHoverBackColor: string,
@@ -123,6 +124,7 @@ type ColorPaletteType = {
 const colorPaletteForLight: ColorPaletteType = {
     backColor: "#00000020",
     backColor2: "#FFFFFFA0",
+    overlayBackColor:"#000000A0",
     frontColor: "#000",
     borderColor: "#00000020",
     itemHoverBackColor: "#000000C8",
@@ -135,6 +137,7 @@ const colorPaletteForLight: ColorPaletteType = {
 const colorPaletteForDark: ColorPaletteType = {
     backColor: "#FFFFFF20",
     backColor2: "#000000A0",
+    overlayBackColor:"#FFFFFFA0",
     frontColor: "#FFF",
     borderColor: "#FFFFFF20",
     itemHoverBackColor: "#FFFFFFC8",
@@ -427,6 +430,41 @@ async function copyMarkdownCodeBlockCode() {
 
 /*
 ------------------------------------------------------------------------
+フルスクリーン関連
+------------------------------------------------------------------------
+*/
+
+const visibleFullScreen = ref(false)
+let body_overflow_backup:string ="";
+
+function openFullScreen(){
+    body_overflow_backup = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    visibleFullScreen.value= true;
+    document.addEventListener('keydown' , FullScreenOnKeyDown);
+}
+
+
+
+function closeFullScreen(){
+    visibleFullScreen.value= false;
+    document.body.style.overflow = body_overflow_backup;
+    document.removeEventListener('keydown' , FullScreenOnKeyDown);
+}
+
+
+const FullScreenOnKeyDown = (event:KeyboardEvent) =>{
+    event.preventDefault();
+    if(event.key === 'Escape'){
+        closeFullScreen();
+    }
+};
+
+
+
+
+/*
+------------------------------------------------------------------------
 汎用処理
 ------------------------------------------------------------------------
 */
@@ -503,9 +541,9 @@ const isValidExport = computed(()=>{
                     <div class="mdr-operation-panel-button" @click="EnableDrawAreaSizeFitByDiagramSize = !EnableDrawAreaSizeFitByDiagramSize">
                         {{(EnableDrawAreaSizeFitByDiagramSize) ? "幅フィット解除" : "幅フィット"}}
                     </div>
-                    <div class="mdr-operation-panel-button">⛶</div>
+                    <div class="mdr-operation-panel-button" @click="openFullScreen();">⛶</div>
                 </div>
-
+ 
             </div>
 
             <div class="mdr-operation-panel-frame" v-if="(currentContentType == 'Code') && (config.CodeMaxHeight != 0)">
@@ -588,6 +626,23 @@ const isValidExport = computed(()=>{
             </div>
        </div>
     </div>
+
+    <Teleport to="body">
+        <div class="mdr-fullscreen-overlay" v-if="visibleFullScreen" ontouchstart="">
+            <div class="mdr-fullscreen-wall">
+                <div class="mdr-fullscreen-system-buttons-frame">
+                   <div class="mdr-fullscreen-system-buttons-panel">
+                    <div class="mdr-fullscreen-system-button" @click="closeFullScreen();">
+                        閉じる
+                    </div>  
+                </div> 
+             </div>
+
+
+            </div>
+        </div>
+    </Teleport>
+
 </template>
 
 
@@ -622,6 +677,7 @@ const isValidExport = computed(()=>{
 .mdr-innerFrame-for-codegroup {
     margin: 5px;
 }
+
 
 
 
@@ -861,5 +917,84 @@ const isValidExport = computed(()=>{
     color: v-bind('currentColorPallet?.itemHoverFrontColor');
     cursor: pointer;
 }
+
+
+/*
+
+    Teleport : フルスクリーン
+
+*/
+
+.mdr-fullscreen-overlay{
+    --mdr-border-radius-size: 10px;
+
+    position: fixed;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: v-bind('currentColorPallet.overlayBackColor');
+    inset: 0;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    overflow: hidden;
+}
+
+.mdr-fullscreen-wall{
+    --mdr-safearea-width:calc(env(safe-area-inset-left) + env(safe-area-inset-right));
+    --mdr-safearea-height:calc(env(safe-area-inset-top) + env(safe-area-inset-bottom));
+
+    width: 95vw;
+    height: 95vh;
+    
+    margin: 0;
+    padding: 5px;
+    background: v-bind('currentColorPallet.backColor2');
+    border: 2px solid v-bind('currentColorPallet?.borderColor');
+    border-radius: var(--mdr-border-radius-size);
+    overflow: hidden;
+    display: block;
+
+    /* dvw , dvh 対応環境用 */
+    width: 95dvw;
+    height: 95dvh; 
+}
+
+.mdr-fullscreen-system-buttons-frame{
+    border-bottom: 1px solid v-bind('currentColorPallet?.borderColor');
+    min-height: 30px;
+    display: flex;
+}
+
+.mdr-fullscreen-system-buttons-panel{
+    display: flex;
+    overflow: hidden;
+    margin: 5px 5px 5px auto;
+}
+
+.mdr-fullscreen-system-button{
+    display: block;
+    min-width: 38px;
+    padding: 5px 5px;
+    margin: 0 5px;
+    text-align: center;
+    overflow: hidden;
+    border: 2px solid v-bind('currentColorPallet?.borderColor');
+    border-radius: var(--mdr-border-radius-size);
+}
+
+@media (hover: hover){
+    .mdr-fullscreen-system-button:hover {
+        background: v-bind('currentColorPallet?.itemHoverBackColor');
+        color: v-bind('currentColorPallet?.itemHoverFrontColor');
+        cursor: pointer;
+    }
+}
+
+.mdr-fullscreen-system-button:active {
+    background: v-bind('currentColorPallet?.itemHoverBackColor');
+    color: v-bind('currentColorPallet?.itemHoverFrontColor');
+    cursor: pointer;
+}
+
 
 </style>
