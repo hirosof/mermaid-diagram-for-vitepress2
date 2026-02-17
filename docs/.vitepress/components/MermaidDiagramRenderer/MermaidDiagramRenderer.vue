@@ -401,7 +401,7 @@ const eitherCopiedMark = computed(()=>{
 
 async function copyTextData(data:string){
     try{
-        await navigator.clipboard.writeText(MermaidCode)
+        await navigator.clipboard.writeText(data)
         eitherCopied.value = true;
         setTimeout(() => { eitherCopied.value = false; }, 500);
     }catch(e){
