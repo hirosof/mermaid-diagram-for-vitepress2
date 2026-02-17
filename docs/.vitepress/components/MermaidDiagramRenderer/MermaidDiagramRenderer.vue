@@ -66,15 +66,35 @@ const CodeMaxHeightStr = (config.value.CodeMaxHeight != 0) ? config.value.CodeMa
 ------------------------------------------------------------------------
 */
 
-type ContentsType = "Diagram" | "Code";
+type ContentsType = "Diagram" | "Code" | "Exports";
 const currentContentType = ref<ContentsType>((config.value.InitShowType == 'Diagram') ? 'Diagram' : 'Code');
+
+function displayNameFromContentsType(type: ContentsType){
+    switch(type){
+        case 'Diagram':
+            return 'ダイアグラム';
+        case 'Code':
+            return '元コード';
+        case 'Exports':
+            return 'エクスポート';
+    }
+
+}
+
+function nextContentType(type :ContentsType) : ContentsType{
+    switch(type){
+        case 'Diagram':
+            return 'Code';
+        case 'Code':
+            return (isValidExport.value) ? 'Exports': 'Diagram';
+        case 'Exports':
+            return 'Diagram';
+    }
+}
+
 function changeContentType(type: ContentsType | null) {
     if (!type) {
-        if (currentContentType.value === 'Diagram') {
-            changeContentType("Code");
-        } else {
-            changeContentType("Diagram");
-        }
+        changeContentType(nextContentType(currentContentType.value));
         return;
     }
     currentContentType.value = type;
@@ -90,34 +110,37 @@ function changeContentType(type: ContentsType | null) {
 //カラーパレットの型
 type ColorPaletteType = {
     backColor: string,
+    backColor2: string,
     frontColor: string,
     borderColor: string,
-    tabItemHoverBackColor: string,
-    tabItemHoverFrontColor: string,
-    tabActivedItemBackColor: string,
-    tabActivedItemFrontColor: string,
+    itemHoverBackColor: string,
+    itemHoverFrontColor: string,
+    activedItemBackColor: string,
+    activedItemFrontColor: string,
 }
 
 //ライトモード時のカラーパレット
 const colorPaletteForLight: ColorPaletteType = {
     backColor: "#00000020",
+    backColor2: "#FFFFFFA0",
     frontColor: "#000",
     borderColor: "#00000020",
-    tabItemHoverBackColor: "#000000C8",
-    tabItemHoverFrontColor: "#FFF",
-    tabActivedItemBackColor: "#000",
-    tabActivedItemFrontColor: "#FFF"
+    itemHoverBackColor: "#000000C8",
+    itemHoverFrontColor: "#FFF",
+    activedItemBackColor: "#000",
+    activedItemFrontColor: "#FFF"
 }
 
 //ダークモード時のカラーパレット
 const colorPaletteForDark: ColorPaletteType = {
     backColor: "#FFFFFF20",
+    backColor2: "#000000A0",
     frontColor: "#FFF",
     borderColor: "#FFFFFF20",
-    tabItemHoverBackColor: "#FFFFFFC8",
-    tabItemHoverFrontColor: "#000",
-    tabActivedItemBackColor: "#FFF",
-    tabActivedItemFrontColor: "#000"
+    itemHoverBackColor: "#FFFFFFC8",
+    itemHoverFrontColor: "#000",
+    activedItemBackColor: "#FFF",
+    activedItemFrontColor: "#000"
 }
 
 
@@ -401,7 +424,7 @@ const isValidMermaidCode = computed(()=>{
     return MermaidCode.length > 0;
 })
 
-const isValidExportToolbar = computed(()=>{
+const isValidExport = computed(()=>{
     return isValidDiagramData.value || isValidMermaidCode.value;
 });
 
@@ -415,7 +438,7 @@ const isValidExportToolbar = computed(()=>{
 <template>
     <!--フレーム-->
     <div class="mdr-frame" :class="{ 'language-mermaid': isThisCodeGroupElement, 'active': (isCodeGroupFirstItem != null) }"
-        ref="mdr_frame_container">
+        ref="mdr_frame_container" ontouchstart="">
         <div class="mdr-innerFrame" :class="{ 'mdr-innerFrame-for-codegroup': isThisCodeGroupElement }">
 
             <!--コンテンツタブ-->
@@ -423,14 +446,17 @@ const isValidExportToolbar = computed(()=>{
                 <div class="mdr-content-tab"  v-if="config.ShowTypeSwitchType=='Tab'">
                     <div class="mdr-content-tab-item"
                         :class="{ 'mdr-content-tab-item-actived': currentContentType === 'Diagram' }"
-                        @click="changeContentType('Diagram')">ダイアグラム</div>
+                        @click="changeContentType('Diagram')">{{ displayNameFromContentsType('Diagram') }}</div>
                     <div class="mdr-content-tab-item"
                         :class="{ 'mdr-content-tab-item-actived': currentContentType === 'Code' }"
-                        @click="changeContentType('Code')">Mermaidコード</div>
+                        @click="changeContentType('Code')">{{displayNameFromContentsType('Code')}}</div>
+                    <div class="mdr-content-tab-item" v-if="isValidExport"
+                        :class="{ 'mdr-content-tab-item-actived': currentContentType === 'Exports' }"
+                        @click="changeContentType('Exports')">{{displayNameFromContentsType('Exports')}}</div>
                 </div>
                 <div class="mdr-content-tab"  v-if="config.ShowTypeSwitchType=='Swap'">
                     <div class="mdr-content-tab-item" @click="changeContentType(null)">
-                        🔃 {{ (currentContentType==='Code')? "ダイアグラム" :"Mermaidコード" }}表示へ切り替える
+                        🔃 {{ displayNameFromContentsType(nextContentType(currentContentType)) }}画面へ切り替える
                     </div>
                 </div>
             </div>
@@ -491,28 +517,40 @@ const isValidExportToolbar = computed(()=>{
                         'mdr-code-block-max-height' : (config.CodeMaxHeight != 0) && EnableCodeBlockAreaMaxSize
                     }" />
 
-            </div>
-
-            <div class="mdr-export-toolbar-frame" v-if="isValidExportToolbar">
-                <div class="mdr-export-toolbar-label">ダウンロード：</div>
-                <div class="mdr-export-toolbar">
-                    <div v-if="isValidDiagramData" class="mdr-export-toolbar-item" @click="downloadSvg()">SVG</div>
-                    <div v-if="isValidDiagramData" class="mdr-export-toolbar-item" @click="downloadPng(false)">PNG</div>
-                    <div v-if="isValidDiagramData" class="mdr-export-toolbar-item" @click="downloadPng(true)">透過PNG</div>
-                    <div v-if="isValidMermaidCode" class="mdr-export-toolbar-item" @click="downloadMermaidCodeFile()">Mermaidコード</div>
+                <div class="mdr-exports" v-if="currentContentType==='Exports'">
+                    <ul>
+                        <li>ダウンロード
+                            <ul>
+                                <li @click="downloadSvg()">
+                                    SVG
+                                </li>
+                                <li @click="downloadPng(false)">
+                                    PNG
+                                </li>
+                                <li @click="downloadPng(true)">
+                                    透過PNG
+                                </li>
+                                <li @click="downloadMermaidCodeFile()">
+                                    元コード (Mermaidコード)
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>コピー
+                            <ul>
+                                <li @click="copyMermaidSVG()">
+                                    {{ (mermaidSVGCopied) ? '✅' : '' }} SVG
+                                </li>
+                                <li @click="copyMermaidCode()">
+                                    {{ (mermaidCodeCopied) ? '✅' : '' }} 元コード (Mermaidコード)
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <div class="mdr-export-toolbar-frame" v-if="isValidExportToolbar">
-                <div class="mdr-export-toolbar-label">コピー：</div>
-                <div class="mdr-export-toolbar">
-                    <div v-if="isValidDiagramData" class="mdr-export-toolbar-item" @click="copyMermaidSVG()">
-                         {{ (mermaidSVGCopied) ? '✅' : '📋' }} SVG
-                    </div>
-                    <div v-if="isValidMermaidCode" class="mdr-export-toolbar-item" @click="copyMermaidCode()">
-                        {{ (mermaidCodeCopied) ? '✅' : '📋' }} Mermaidコード</div>
-                </div>
-            </div>
-        </div>
+       </div>
     </div>
 </template>
 
@@ -579,22 +617,22 @@ const isValidExportToolbar = computed(()=>{
 
 @media (hover: hover){
     .mdr-content-tab-item:hover {
-        background: v-bind('currentColorPallet?.tabItemHoverBackColor');
-        color: v-bind('currentColorPallet?.tabItemHoverFrontColor');
+        background: v-bind('currentColorPallet?.itemHoverBackColor');
+        color: v-bind('currentColorPallet?.itemHoverFrontColor');
         cursor: pointer;
     }
 }
 
 .mdr-content-tab-item:active {
-    background: v-bind('currentColorPallet?.tabItemHoverBackColor');
-    color: v-bind('currentColorPallet?.tabItemHoverFrontColor');
+    background: v-bind('currentColorPallet?.itemHoverBackColor');
+    color: v-bind('currentColorPallet?.itemHoverFrontColor');
     cursor: pointer;
 }
 
 
 .mdr-content-tab-item-actived {
-    background: v-bind('currentColorPallet?.tabActivedItemBackColor');
-    color: v-bind('currentColorPallet?.tabActivedItemFrontColor');
+    background: v-bind('currentColorPallet?.activedItemBackColor');
+    color: v-bind('currentColorPallet?.activedItemFrontColor');
 }
 
 /* 操作パネル */
@@ -623,15 +661,15 @@ const isValidExportToolbar = computed(()=>{
 
 @media (hover: hover){
     .mdr-operation-panel-button:hover {
-        background: v-bind('currentColorPallet?.tabItemHoverBackColor');
-        color: v-bind('currentColorPallet?.tabItemHoverFrontColor');
+        background: v-bind('currentColorPallet?.itemHoverBackColor');
+        color: v-bind('currentColorPallet?.itemHoverFrontColor');
         cursor: pointer;
     }
 }
 
 .mdr-operation-panel-button:active {
-    background: v-bind('currentColorPallet?.tabItemHoverBackColor');
-    color: v-bind('currentColorPallet?.tabItemHoverFrontColor');
+    background: v-bind('currentColorPallet?.itemHoverBackColor');
+    color: v-bind('currentColorPallet?.itemHoverFrontColor');
     cursor: pointer;
 }
 
@@ -719,6 +757,64 @@ const isValidExportToolbar = computed(()=>{
 }
 
 
+
+/* エクスポート */
+
+.mdr-exports{
+    padding: 5px;
+    overflow: auto;
+    
+} 
+
+.mdr-exports > ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+.mdr-exports > ul > li{
+    margin: 5px;
+    padding: 5px;
+    background: v-bind('currentColorPallet?.backColor');
+    border-radius: var(--mdr-border-radius-size);
+}
+
+.mdr-exports > ul > li > ul{
+    background: v-bind('currentColorPallet?.backColor2');
+    text-align: left;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+
+.mdr-exports > ul > li > ul > li{
+    padding: 5px;
+    margin: 0;
+    border-bottom: 1px solid v-bind('currentColorPallet?.borderColor');
+}
+
+.mdr-exports > ul > li > ul > li:last-of-type{
+    border-bottom: none;
+}
+
+
+@media (hover: hover){
+    .mdr-exports > ul > li > ul > li:hover {
+        background: v-bind('currentColorPallet?.itemHoverBackColor');
+        color: v-bind('currentColorPallet?.itemHoverFrontColor');
+        cursor: pointer;
+    }
+}
+
+.mdr-exports > ul > li > ul > li:active {
+    background: v-bind('currentColorPallet?.itemHoverBackColor');
+    color: v-bind('currentColorPallet?.itemHoverFrontColor');
+    cursor: pointer;
+}
+
+
 /* エクスポートツールバー */
 
 .mdr-export-toolbar-frame {
@@ -758,15 +854,15 @@ const isValidExportToolbar = computed(()=>{
 
 @media (hover: hover){
     .mdr-export-toolbar-item:hover {
-        background: v-bind('currentColorPallet?.tabItemHoverBackColor');
-        color: v-bind('currentColorPallet?.tabItemHoverFrontColor');
+        background: v-bind('currentColorPallet?.itemHoverBackColor');
+        color: v-bind('currentColorPallet?.itemHoverFrontColor');
         cursor: pointer;
     }
 }
 
 .mdr-export-toolbar-item:active {
-    background: v-bind('currentColorPallet?.tabItemHoverBackColor');
-    color: v-bind('currentColorPallet?.tabItemHoverFrontColor');
+    background: v-bind('currentColorPallet?.itemHoverBackColor');
+    color: v-bind('currentColorPallet?.itemHoverFrontColor');
     cursor: pointer;
 }
 </style>
