@@ -24,6 +24,7 @@ import { ref, computed, onMounted, watch, nextTick,useId, Ref, onUnmounted } fro
 import { useData } from 'vitepress'
 import { MDRDefaultConfig, type MDRConfig } from './MDRConfig'
 import mermaid from 'mermaid';
+import { RefSymbol } from '@vue/reactivity';
 
 
 // 属性の取得
@@ -434,14 +435,31 @@ async function copyMarkdownCodeBlockCode() {
 ------------------------------------------------------------------------
 */
 
+
+const FullScreenContentsAreaElement = ref<HTMLElement>();
+const FullScreenDiagramAreaElement = ref<HTMLElement>();
+
 const visibleFullScreen = ref(false)
 let body_overflow_backup:string ="";
+
+const FullScreenDiagramZoomRateMin = 10;
+const InitializedFullScreenDiagramZoomRate = 100;
+const FullScreenDiagramZoomRateMax = 300;
+const FullScreenDiagramZoomRateStep = 10;
+const FullScreenDiagramZoomRate = ref(InitializedFullScreenDiagramZoomRate);
+
+
 
 function openFullScreen(){
     body_overflow_backup = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     visibleFullScreen.value= true;
-    document.addEventListener('keydown' , FullScreenOnKeyDown);
+    document.addEventListener('keydown' , FullScreenOnKeyDown); 
+    nextTick(()=>{
+        if((FullScreenContentsAreaElement.value !=undefined) && (FullScreenDiagramAreaElement.value !=undefined)){
+
+        }
+    })
 }
 
 
@@ -450,6 +468,7 @@ function closeFullScreen(){
     visibleFullScreen.value= false;
     document.body.style.overflow = body_overflow_backup;
     document.removeEventListener('keydown' , FullScreenOnKeyDown);
+
 }
 
 
@@ -459,9 +478,6 @@ const FullScreenOnKeyDown = (event:KeyboardEvent) =>{
         closeFullScreen();
     }
 };
-
-
-
 
 /*
 ------------------------------------------------------------------------
@@ -642,15 +658,15 @@ const isValidExport = computed(()=>{
                 <div class="mdr-fullscreen-general-menu-frame">
                     <ul class="mdr-fullscreen-general-menu mdr-fullscreen-operation-menu">
                         <li>
-                            最小
+                           最小
                         </li>
-                        <li >
+                        <li>
                             縮小
                         </li>
-                        <li >
-                            XXX %
+                        <li>
+                            {{ FullScreenDiagramZoomRate }} %
                         </li>
-                        <li >
+                        <li>
                             拡大
                         </li>
                         <li>
@@ -660,8 +676,13 @@ const isValidExport = computed(()=>{
                 </div>
                 <div class="mdr-fullscreen-contents-frame">
 
-                    <div class="mdr-fullscreen-contents-area">
+                    <div class="mdr-fullscreen-contents-area" ref="FullScreenContentsAreaElement">
 
+                        <div class="mdr-fullscreen-diagram-area" ref="FullScreenDiagramAreaElement" v-html="DiagramData">
+
+                            
+                        </div>
+                        
                     </div>
 
 
@@ -1052,11 +1073,14 @@ const isValidExport = computed(()=>{
 
 
 .mdr-fullscreen-contents-area{
-    /* 以下の設定はダミーです */
-    width: 3000px;
-    height: 2000px;
+    padding: 0;
+    margin: 0;
 }
 
-
+.mdr-fullscreen-diagram-area{
+    padding: 0;
+    margin: 0;
+    object-fit: contain;
+}
 
 </style>
