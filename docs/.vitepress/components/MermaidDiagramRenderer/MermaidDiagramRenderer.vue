@@ -20,7 +20,7 @@ let IsMermaidInitializedInDarkMode : boolean | null= null
 --------------------------------------------------------------------->
 <script setup lang="ts">
 
-import { ref, computed, onMounted, watch, nextTick,useId } from 'vue'
+import { ref, computed, onMounted, watch, nextTick,useId, Ref } from 'vue'
 import { useData } from 'vitepress'
 import { MDRDefaultConfig, type MDRConfig } from './MDRConfig'
 import mermaid from 'mermaid';
@@ -286,16 +286,32 @@ function getSVGSize(target_svg : string , areaSizeForFailedGotSVGRealSize : MDRS
     return {width:width , height:height} satisfies MDRSize;
 }
 
+/*
+------------------------------------------------------------------------
+追加の生成系
+------------------------------------------------------------------------
+*/
 
+function createMarkdownCodeBlockCode() : string{
+    let code = "```mermaid\n"+MermaidCode;
+    if(code[code.length-1] !== '\n') code+='\n';
+    code += "```\n"
+    return code;
+}
 
 /*
 ------------------------------------------------------------------------
 ダウンロード処理
 ------------------------------------------------------------------------
 */
+
+function getDownloadFileNameBase() : string{
+    return DiagramID.value;
+}
+
 function downloadSvg() {
     const blob = new Blob([DiagramData.value], { type: 'image/svg+xml;charset=utf-8' })
-    triggerDownload(blob, `${DiagramID.value}.svg`)
+    triggerDownload(blob, getDownloadFileNameBase() + ".svg")
 }
 
 
@@ -330,7 +346,7 @@ function downloadPng(isTransparent : boolean) {
             img.onload = () => {
                 ctx.drawImage(img, 0, 0, width, height)
                 canvas.toBlob((blob) => {
-                    if (blob) triggerDownload(blob, `${DiagramID.value}.png`)
+                    if (blob) triggerDownload(blob, getDownloadFileNameBase() + ".png")
                 }, 'image/png')
             }
             img.src = dataUrl
@@ -344,8 +360,13 @@ function downloadPng(isTransparent : boolean) {
 
 function downloadMermaidCodeFile(){
    const blob = new Blob([MermaidCode], { type: 'text/vnd.mermaid' })
-    triggerDownload(blob, `${DiagramID.value}.mmd`)
+    triggerDownload(blob, getDownloadFileNameBase() + ".mmd")
 }
+function downloadMarkdownCodeBlockCodeFile(){
+   const blob = new Blob([createMarkdownCodeBlockCode()], { type: 'text/markdown' })
+    triggerDownload(blob, getDownloadFileNameBase() + ".md")
+}
+
 
 
 
@@ -365,32 +386,43 @@ function triggerDownload(blob: Blob, filename: string) {
 */
 
 
-const mermaidCodeCopied = ref(false)
-async function copyMermaidCode() {
+const eitherCopied = ref<Boolean | 'Error'>(false)
+const eitherCopiedMark = computed(()=>{
+    switch(eitherCopied.value){
+        case true:
+            return '✅';
+        case false:
+            return '';
+        case 'Error':
+            return '❌️'
+    }
+    return '';
+})
+
+async function copyTextData(data:string){
     try{
         await navigator.clipboard.writeText(MermaidCode)
-        mermaidCodeCopied.value = true;
-        setTimeout(() => {
-            mermaidCodeCopied.value = false;
-        }, 2000);
+        eitherCopied.value = true;
+        setTimeout(() => { eitherCopied.value = false; }, 500);
     }catch(e){
-        console.error("copyMermaidCode Error : " + e);
+        eitherCopied.value = 'Error'
+        console.error("copyTextData Error : " + e);
+        setTimeout(() => { eitherCopied.value = false; }, 1000);
     }
+
 }
 
-const mermaidSVGCopied = ref(false)
+async function copyMermaidCode() {
+    copyTextData(MermaidCode);
+}
+
 async function copyMermaidSVG() {
-    try{
-        await navigator.clipboard.writeText(DiagramData.value)
-        mermaidSVGCopied.value = true;
-        setTimeout(() => {
-            mermaidSVGCopied.value = false;
-        }, 2000);
-    }catch(e){
-        console.error("copyMermaidSVG Error : " + e);
-    }
+    copyTextData(DiagramData.value);
 }
 
+async function copyMarkdownCodeBlockCode() {
+    copyTextData(createMarkdownCodeBlockCode());
+}
 
 
 /*
@@ -531,19 +563,23 @@ const isValidExport = computed(()=>{
                                     透過PNG
                                 </li>
                                 <li @click="downloadMermaidCodeFile()">
-                                    元コード (Mermaidコード)
+                                    元コード (Mermaidファイル)
+                                </li>
+                                <li @click="downloadMarkdownCodeBlockCodeFile()">
+                                    Markdownファイル (コードブロックのみ)
                                 </li>
                             </ul>
                         </li>
-                    </ul>
-                    <ul>
-                        <li><div>コピー</div>
+                        <li><div>{{ eitherCopiedMark }}コピー</div>
                             <ul>
                                 <li @click="copyMermaidSVG()">
-                                    {{ (mermaidSVGCopied) ? '✅' : '' }} SVG
+                                    SVG
                                 </li>
                                 <li @click="copyMermaidCode()">
-                                    {{ (mermaidCodeCopied) ? '✅' : '' }} 元コード (Mermaidコード)
+                                    元コード (Mermaidコード)
+                                </li>
+                                <li @click="copyMarkdownCodeBlockCode()">
+                                    Markdownコードブロック
                                 </li>
                             </ul>
                         </li>
@@ -763,7 +799,6 @@ const isValidExport = computed(()=>{
 .mdr-exports{
     padding: 5px;
     overflow: auto;
-    
 } 
 
 .mdr-exports > ul{
@@ -771,14 +806,22 @@ const isValidExport = computed(()=>{
     margin: 0;
     padding: 0;
     text-align: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
 }
+
 
 .mdr-exports > ul > li{
     margin: 5px;
     padding: 5px;
+    flex-grow: 1;
     background: v-bind('currentColorPallet?.backColor');
     border-radius: var(--mdr-border-radius-size);
 }
+
 
 .mdr-exports > ul > li > div{
     padding: 5px;
@@ -788,8 +831,9 @@ const isValidExport = computed(()=>{
     background: v-bind('currentColorPallet?.backColor2');
     text-align: left;
     list-style: none;
-    margin: 0;
+    margin: 4px;
     padding: 0;
+
 }
 
 
@@ -818,55 +862,4 @@ const isValidExport = computed(()=>{
     cursor: pointer;
 }
 
-
-/* エクスポートツールバー */
-
-.mdr-export-toolbar-frame {
-    border-top: 1px solid v-bind('currentColorPallet?.borderColor');
-    min-height: 30px;
-    display: flex;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: 5px;
-}
-
-
-.mdr-export-toolbar-label{
-    text-align: left;
-    margin: auto 5px;
-}
-
-.mdr-export-toolbar {
-    margin: 5px 5px 5px auto;
-    border: 2px solid v-bind('currentColorPallet?.borderColor');
-    display: flex;
-    justify-content: flex-end;
-    border-radius: var(--mdr-border-radius-size);
-    overflow: hidden;
-}
-
-.mdr-export-toolbar-item {
-
-    padding: 5px 10px;
-    text-align: center;
-    border-right: 1px solid v-bind('currentColorPallet?.borderColor');
-}
-
-.mdr-export-toolbar-item:last-of-type {
-    border-right: none;
-}
-
-@media (hover: hover){
-    .mdr-export-toolbar-item:hover {
-        background: v-bind('currentColorPallet?.itemHoverBackColor');
-        color: v-bind('currentColorPallet?.itemHoverFrontColor');
-        cursor: pointer;
-    }
-}
-
-.mdr-export-toolbar-item:active {
-    background: v-bind('currentColorPallet?.itemHoverBackColor');
-    color: v-bind('currentColorPallet?.itemHoverFrontColor');
-    cursor: pointer;
-}
 </style>
