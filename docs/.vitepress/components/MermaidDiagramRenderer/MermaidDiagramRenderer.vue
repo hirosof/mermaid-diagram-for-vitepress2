@@ -20,7 +20,7 @@ let IsMermaidInitializedInDarkMode : boolean | null= null
 --------------------------------------------------------------------->
 <script setup lang="ts">
 
-import { ref, computed, onMounted, watch, nextTick,useId, Ref } from 'vue'
+import { ref, computed, onMounted, watch, nextTick,useId, Ref, onUnmounted } from 'vue'
 import { useData } from 'vitepress'
 import { MDRDefaultConfig, type MDRConfig } from './MDRConfig'
 import mermaid from 'mermaid';
@@ -454,8 +454,8 @@ function closeFullScreen(){
 
 
 const FullScreenOnKeyDown = (event:KeyboardEvent) =>{
-    event.preventDefault();
     if(event.key === 'Escape'){
+        event.preventDefault();
         closeFullScreen();
     }
 };
@@ -479,7 +479,9 @@ onMounted(() => {
     onChangeTheme();
 })
 
-
+onUnmounted(()=>{
+    if(visibleFullScreen.value) closeFullScreen();
+})
 
 const isShowDiagramTitle = computed(()=>{
     return config.value.ShowDiagramTitle && (props.title.length > 0);
@@ -973,7 +975,7 @@ const isValidExport = computed(()=>{
 
 .mdr-fullscreen-system-button{
     display: block;
-    min-width: 38px;
+    min-width: 100px;
     padding: 5px 5px;
     margin: 0 5px;
     text-align: center;
