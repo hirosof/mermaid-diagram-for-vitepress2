@@ -519,7 +519,7 @@ const isValidExport = computed(()=>{
 
                 <div class="mdr-exports" v-if="currentContentType==='Exports'">
                     <ul>
-                        <li>ダウンロード
+                        <li><div>ダウンロード</div>
                             <ul>
                                 <li @click="downloadSvg()">
                                     SVG
@@ -537,7 +537,7 @@ const isValidExport = computed(()=>{
                         </li>
                     </ul>
                     <ul>
-                        <li>コピー
+                        <li><div>コピー</div>
                             <ul>
                                 <li @click="copyMermaidSVG()">
                                     {{ (mermaidSVGCopied) ? '✅' : '' }} SVG
@@ -778,6 +778,10 @@ const isValidExport = computed(()=>{
     padding: 5px;
     background: v-bind('currentColorPallet?.backColor');
     border-radius: var(--mdr-border-radius-size);
+}
+
+.mdr-exports > ul > li > div{
+    padding: 5px;
 }
 
 .mdr-exports > ul > li > ul{
