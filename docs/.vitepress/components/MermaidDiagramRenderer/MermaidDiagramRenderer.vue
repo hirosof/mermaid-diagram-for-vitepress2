@@ -463,6 +463,9 @@ function openFullScreen(){
 }
 
 
+function SetFullScreenDiagramZoomRate(val :number){
+    FullScreenDiagramZoomRate.value = Math.max(FullScreenDiagramZoomRateMin , Math.min(val , FullScreenDiagramZoomRateMax))
+}
 
 function closeFullScreen(){
     visibleFullScreen.value= false;
@@ -478,6 +481,8 @@ const FullScreenOnKeyDown = (event:KeyboardEvent) =>{
         closeFullScreen();
     }
 };
+
+
 
 /*
 ------------------------------------------------------------------------
@@ -657,19 +662,19 @@ const isValidExport = computed(()=>{
                 </div>
                 <div class="mdr-fullscreen-general-menu-frame">
                     <ul class="mdr-fullscreen-general-menu mdr-fullscreen-operation-menu">
-                        <li>
+                         <li @click="SetFullScreenDiagramZoomRate(FullScreenDiagramZoomRateMin)">
                            最小
                         </li>
-                        <li>
+                        <li @click="SetFullScreenDiagramZoomRate(FullScreenDiagramZoomRate - FullScreenDiagramZoomRateStep)">
                             縮小
                         </li>
-                        <li>
+                        <li @click="SetFullScreenDiagramZoomRate(InitializedFullScreenDiagramZoomRate)">
                             {{ FullScreenDiagramZoomRate }} %
                         </li>
-                        <li>
+                        <li @click="SetFullScreenDiagramZoomRate(FullScreenDiagramZoomRate + FullScreenDiagramZoomRateStep)">
                             拡大
                         </li>
-                        <li>
+                         <li @click="SetFullScreenDiagramZoomRate(FullScreenDiagramZoomRateMax)">
                             最大
                         </li>
                     </ul>
