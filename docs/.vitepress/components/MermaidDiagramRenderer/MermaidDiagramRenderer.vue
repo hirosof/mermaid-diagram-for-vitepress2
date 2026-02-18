@@ -279,8 +279,8 @@ function getSVGSize(target_svg : string , areaSizeForFailedGotSVGRealSize : MDRS
 
     if(viewBoxAttribute != null){
         const parts = viewBoxAttribute.split(/[\s,]+/)
-        width = parseFloat(parts[2]);
-        height = parseFloat(parts[3]);
+        width = parseFloat(parts[2]) - parseFloat(parts[0]);
+        height = parseFloat(parts[3]) - parseFloat(parts[1]);
     }else{
         width = parseFloat(svg_element.getAttribute('width') || realAreaSize.width.toString())
         height = parseFloat(svg_element.getAttribute('height') || realAreaSize.height.toString())
