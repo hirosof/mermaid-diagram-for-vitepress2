@@ -669,7 +669,7 @@ const isValidExport = computed(()=>{
                             縮小
                         </li>
                         <li @click="SetFullScreenDiagramZoomRate(InitializedFullScreenDiagramZoomRate)">
-                            {{ FullScreenDiagramZoomRate }} %
+                            {{ FullScreenDiagramZoomRate }}%
                         </li>
                         <li @click="SetFullScreenDiagramZoomRate(FullScreenDiagramZoomRate + FullScreenDiagramZoomRateStep)">
                             拡大
@@ -1086,6 +1086,8 @@ const isValidExport = computed(()=>{
     padding: 0;
     margin: 0;
     object-fit: contain;
+    transform-origin: left top;
+    transform: scale(calc(v-bind('FullScreenDiagramZoomRate') / 100));
 }
 
 </style>
