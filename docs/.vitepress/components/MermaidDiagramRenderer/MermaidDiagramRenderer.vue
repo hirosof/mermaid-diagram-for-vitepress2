@@ -801,7 +801,7 @@ const isValidExport = computed(()=>{
 .mdr-operation-panel-button {
     min-width: 38px;
     padding: 5px 5px;
-    margin: 0 5px;
+    margin: 0 2.5px;
     text-align: center;
     border: 2px solid v-bind('currentColorPallet?.borderColor');
     border-radius: var(--mdr-border-radius-size);
