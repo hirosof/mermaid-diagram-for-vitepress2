@@ -1041,6 +1041,7 @@ const isValidExport = computed(()=>{
     background: v-bind('currentColorPallet.backColor2');
     border: 2px solid v-bind('currentColorPallet?.borderColor');
     border-radius: var(--mdr-border-radius-size);
+    user-select: none;
 }
 
 
