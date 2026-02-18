@@ -177,7 +177,7 @@ let   DiagramGeneratedNumber = 0;
 
 const DiagramDrawTargetElement = ref<HTMLElement>();
 
-const EnableDrawAreaSizeFitByDiagramSize = ref(true);
+const EnableDrawAreaBaseSizeFitByDiagramSize = ref(false);
 const DrawAreaSizeForDiagramSizeMatch = computed(()=>{
     if(!DiagramSize.value) return {};
     return {
@@ -187,12 +187,12 @@ const DrawAreaSizeForDiagramSizeMatch = computed(()=>{
 })
 
 const DrawAreaSize = computed(()=>{
-    if(EnableDrawAreaSizeFitByDiagramSize.value) return {};
+    if(!EnableDrawAreaBaseSizeFitByDiagramSize.value) return {};
     return DrawAreaSizeForDiagramSizeMatch.value;
 })
 
 
-const EnableDiagramDrawAreaMaxSize = ref(true);
+const EnableDiagramDrawAreaMaxHeight = ref(true);
 
 const MermaidCode = decodeURIComponent(props.code);
 const DiagramData = ref('')
@@ -442,15 +442,20 @@ const FullScreenDiagramAreaElement = ref<HTMLElement>();
 const visibleFullScreen = ref(false)
 let body_overflow_backup:string ="";
 
-const FullScreenDiagramZoomRateMin = 10;
+const FullScreenDiagramZoomRateMin = 50;
 const InitializedFullScreenDiagramZoomRate = 100;
-const FullScreenDiagramZoomRateMax = 300;
+const FullScreenDiagramZoomRateMax = 500;
 const FullScreenDiagramZoomRateStep = 10;
 const FullScreenDiagramZoomRate = ref(InitializedFullScreenDiagramZoomRate);
-
+const EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen = ref<boolean|null>(null)
 
 
 function openFullScreen(){
+
+    if(EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen.value == null){
+        EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen.value = EnableDrawAreaBaseSizeFitByDiagramSize.value;
+    }
+
     body_overflow_backup = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     visibleFullScreen.value= true;
@@ -558,11 +563,11 @@ const isValidExport = computed(()=>{
 
 
                 <div class="mdr-operation-panel">
-                    <div class="mdr-operation-panel-button" @click="EnableDiagramDrawAreaMaxSize = !EnableDiagramDrawAreaMaxSize" v-if="config.DiagramMaxHeight != 0">
-                        高さ制限{{ EnableDiagramDrawAreaMaxSize?'解除':'設定' }}
+                    <div class="mdr-operation-panel-button" @click="EnableDiagramDrawAreaMaxHeight = !EnableDiagramDrawAreaMaxHeight" v-if="config.DiagramMaxHeight != 0">
+                        高さ制限{{ EnableDiagramDrawAreaMaxHeight?'解除':'設定' }}
                     </div>
-                    <div class="mdr-operation-panel-button" @click="EnableDrawAreaSizeFitByDiagramSize = !EnableDrawAreaSizeFitByDiagramSize">
-                        {{(EnableDrawAreaSizeFitByDiagramSize) ? "幅フィット解除" : "幅フィット"}}
+                    <div class="mdr-operation-panel-button" @click="EnableDrawAreaBaseSizeFitByDiagramSize = !EnableDrawAreaBaseSizeFitByDiagramSize">
+                        {{(EnableDrawAreaBaseSizeFitByDiagramSize) ? "幅基準：ダイアグラム" : "幅基準：描画領域"}}
                     </div>
                     <div class="mdr-operation-panel-button" @click="openFullScreen();">⛶</div>
                 </div>
@@ -592,7 +597,7 @@ const isValidExport = computed(()=>{
                 <div class="mdr-diagram"  v-if="currentContentType == 'Diagram'" 
                     :class="{
                         'mdr-common-style-border-top': isShowDiagramTitle,
-                        'mdr-diagram-max-height': (config.DiagramMaxHeight !=0) && EnableDiagramDrawAreaMaxSize
+                        'mdr-diagram-max-height': (config.DiagramMaxHeight !=0) && EnableDiagramDrawAreaMaxHeight
                     }">
                 
                     <div class="mdr-diagram-drawArea" v-html="DiagramData" ref="DiagramDrawTargetElement" v-if="(DiagramData.length > 0)" :style="DrawAreaSize"/>
@@ -654,7 +659,11 @@ const isValidExport = computed(()=>{
         <div class="mdr-fullscreen-overlay" v-if="visibleFullScreen" ontouchstart="">
             <div class="mdr-fullscreen-wall">
                 <div class="mdr-fullscreen-general-menu-frame">
-                    <ul class="mdr-fullscreen-general-menu mdr-fullscreen-system-menu">
+                     <ul class="mdr-fullscreen-general-menu mdr-fullscreen-system-menu">
+                        <li @click="EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen = !EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen">
+                            {{(EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen) ? "幅基準：ダイアグラム" : "幅基準：描画領域"}}
+                        </li>
+
                         <li @click="closeFullScreen()">
                             閉じる
                         </li>
@@ -680,25 +689,16 @@ const isValidExport = computed(()=>{
                     </ul>
                 </div>
                 <div class="mdr-fullscreen-contents-frame">
-
                     <div class="mdr-fullscreen-contents-area" ref="FullScreenContentsAreaElement">
-
-                        <div class="mdr-fullscreen-diagram-area" ref="FullScreenDiagramAreaElement" v-html="DiagramData">
-
-                            
-                        </div>
-                        
+                        <div class="mdr-fullscreen-diagram-area" ref="FullScreenDiagramAreaElement" v-html="DiagramData"
+                            :class="{'mdr-fullscreen-diagram-area-diagram-fit' : EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen}"
+                        >                            
+                        </div>                        
                     </div>
-
-
                 </div>
-
-
-
             </div>
         </div>
     </Teleport>
-
 </template>
 
 
@@ -1089,6 +1089,12 @@ const isValidExport = computed(()=>{
     object-fit: contain;
     transform-origin: left top;
     transform: scale(calc(v-bind('FullScreenDiagramZoomRate') / 100));
+}
+
+.mdr-fullscreen-diagram-area-diagram-fit{
+    object-fit: none !important;
+    width: v-bind('DrawAreaSizeForDiagramSizeMatch.minWidth');
+    height: v-bind('DrawAreaSizeForDiagramSizeMatch.minHeight');
 }
 
 </style>
