@@ -345,8 +345,10 @@ function downloadPng(isTransparent : boolean) {
                 ctx.fillStyle = (isDark.value) ? '#000' : '#FFF';
                 ctx.fillRect(0,0,canvas.width , canvas.height);
             }
-            const svgBase64 = btoa(unescape(encodeURIComponent(DiagramData.value)))
-            const dataUrl = `data:image/svg+xml;base64,${svgBase64}`
+
+            const svgBytesData = new TextEncoder().encode(DiagramData.value);
+            const svgDataBinString = String.fromCodePoint(...svgBytesData);
+            const dataUrl = "data:image/svg+xml;base64,"+btoa(svgDataBinString);
 
             const img = new Image()
             img.onload = () => {
