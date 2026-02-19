@@ -436,8 +436,12 @@ async function copyMarkdownCodeBlockCode() {
 */
 
 const visibleFullScreen = ref(false)
-let body_overflow_backup:string ="";
+let body_overflow_backup : string = "";
+let body_position_backup : string = "";
+let body_top_backup : string = "";
+let window_scroll_backup_Y : number = 0;
 
+//scrollMargin
 const FullScreenDiagramZoomRateMin = 50;
 const InitializedFullScreenDiagramZoomRate = 100;
 const FullScreenDiagramZoomRateMax = 500;
@@ -447,15 +451,22 @@ const EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen = ref<boolean|null>(nu
 
 
 function openFullScreen(){
+    document.addEventListener('keydown' , FullScreenOnKeyDown); 
 
     if(EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen.value == null){
         EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen.value = EnableDrawAreaBaseSizeFitByDiagramSize.value;
     }
 
+    window_scroll_backup_Y = window.pageYOffset;
+    body_top_backup = document.body.style.top;
     body_overflow_backup = document.body.style.overflow;
+    body_position_backup = document.body.style.position;
+
     document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${window_scroll_backup_Y}px`;
+    
     visibleFullScreen.value= true;
-    document.addEventListener('keydown' , FullScreenOnKeyDown); 
 }
 
 
@@ -464,10 +475,12 @@ function SetFullScreenDiagramZoomRate(val :number){
 }
 
 function closeFullScreen(){
-    visibleFullScreen.value= false;
-    document.body.style.overflow = body_overflow_backup;
     document.removeEventListener('keydown' , FullScreenOnKeyDown);
-
+    document.body.style.overflow = body_overflow_backup;
+    document.body.style.position = body_position_backup;
+    document.body.style.top = body_top_backup;
+    window.scrollTo(0, window_scroll_backup_Y);
+    visibleFullScreen.value= false;
 }
 
 
