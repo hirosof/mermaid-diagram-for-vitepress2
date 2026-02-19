@@ -346,9 +346,7 @@ function downloadPng(isTransparent : boolean) {
                 ctx.fillRect(0,0,canvas.width , canvas.height);
             }
 
-            const svgBytesData = new TextEncoder().encode(DiagramData.value);
-            const svgDataBinString = String.fromCodePoint(...svgBytesData);
-            const dataUrl = "data:image/svg+xml;base64,"+btoa(svgDataBinString);
+            const dataUrl = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(DiagramData.value);
 
             const img = new Image()
             img.onload = () => {
