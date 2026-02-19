@@ -35,7 +35,9 @@ export function MDRTokenInfoProcessor(info: string, content: string): MDRTokenIn
         if(has_active_flag) newinfo_for_bypass += ' active'
 
 
-        var diagram_title = MCLSParser_getNamedParameterValue(parsed.namedParameters , "title")
+        const diagram_title = MCLSParser_getNamedParameterValue(parsed.namedParameters , "title")
+        
+        const diagram_title_encoded = (diagram_title.length>0) ? encodeURIComponent(diagram_title) : "";
 
         const encoded = encodeURIComponent(content)
         const highlightedHtml = highlightMermaidCode(content) // Shiki highlighterから直接ハイライト済みHTMLを生成
@@ -45,7 +47,7 @@ export function MDRTokenInfoProcessor(info: string, content: string): MDRTokenIn
             code="${encoded}"
             highlighted-code="${encodedHtml}"
             startLineNumbers="${line_numbers}"
-            title="${diagram_title}"`;
+            title="${diagram_title_encoded}"`;
 
         if(has_active_flag) tag+=" isCodeGroupFirstItem"
         

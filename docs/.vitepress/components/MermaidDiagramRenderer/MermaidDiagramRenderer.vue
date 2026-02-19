@@ -24,8 +24,6 @@ import { ref, computed, onMounted, watch, nextTick,useId, Ref, onUnmounted } fro
 import { useData } from 'vitepress'
 import { MDRDefaultConfig, type MDRConfig } from './MDRConfig'
 import mermaid from 'mermaid';
-import { RefSymbol } from '@vue/reactivity';
-
 
 // 属性の取得
 const props = defineProps<{
@@ -195,6 +193,7 @@ const DrawAreaSize = computed(()=>{
 const EnableDiagramDrawAreaMaxHeight = ref(true);
 
 const MermaidCode = decodeURIComponent(props.code);
+const DiagramTitle = (props.title.length>0) ? decodeURIComponent(props.title) : "";
 const DiagramData = ref('')
 const DiagramSize = ref<MDRSize>();
 const MermaidException = ref('');
@@ -514,7 +513,7 @@ onUnmounted(()=>{
 })
 
 const isShowDiagramTitle = computed(()=>{
-    return config.value.ShowDiagramTitle && (props.title.length > 0);
+    return config.value.ShowDiagramTitle && (DiagramTitle.length > 0);
 })
 
 
@@ -595,7 +594,7 @@ const isValidExport = computed(()=>{
             <div class="mdr-main">
 
                 <div class="mdr-diagram-title" v-if="isShowDiagramTitle">
-                    {{ title }}
+                    {{ DiagramTitle }}
                 </div>
 
                 <div class="mdr-diagram"  v-if="currentContentType == 'Diagram'" 
