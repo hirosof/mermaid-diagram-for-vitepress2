@@ -113,6 +113,7 @@ type ColorPaletteType = {
     overlayBackColor:string,
     frontColor: string,
     borderColor: string,
+    borderColor2: string,
     itemHoverBackColor: string,
     itemHoverFrontColor: string,
     activedItemBackColor: string,
@@ -125,7 +126,8 @@ const colorPaletteForLight: ColorPaletteType = {
     backColor2: "#FFFFFFA0",
     overlayBackColor:"#000000A0",
     frontColor: "#000",
-    borderColor: "#00000020",
+    borderColor: "#00000040",
+    borderColor2: "#00000080",
     itemHoverBackColor: "#000000C8",
     itemHoverFrontColor: "#FFF",
     activedItemBackColor: "#000",
@@ -138,7 +140,8 @@ const colorPaletteForDark: ColorPaletteType = {
     backColor2: "#000000A0",
     overlayBackColor:"#FFFFFFA0",
     frontColor: "#FFF",
-    borderColor: "#FFFFFF20",
+    borderColor: "#FFFFFF40",
+    borderColor2: "#FFFFFF80",
     itemHoverBackColor: "#FFFFFFC8",
     itemHoverFrontColor: "#000",
     activedItemBackColor: "#FFF",
@@ -690,8 +693,15 @@ const isValidExport = computed(()=>{
                             最大
                         </li>
                     </ul>
+                </div> 
+
+                <div class="mdr-fullscreen-diagram-title-frame" v-if="isShowDiagramTitle">
+                    <div class="mdr-fullscreen-diagram-title" v-if="isShowDiagramTitle">
+                        {{ DiagramTitle }}
+                    </div>
                 </div>
                 <div class="mdr-fullscreen-contents-frame">
+
                     <div class="mdr-fullscreen-contents-area">
                         <div class="mdr-fullscreen-diagram-area" v-html="DiagramData" 
                             :class="{'mdr-fullscreen-diagram-area-diagram-fit' : EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen}" />                            
@@ -1060,6 +1070,19 @@ const isValidExport = computed(()=>{
 }
 
 
+.mdr-fullscreen-diagram-title-frame{
+    border-bottom: 1px solid v-bind('currentColorPallet?.borderColor');
+}
+
+.mdr-fullscreen-diagram-title{
+    margin: 5px 0;
+    padding: 5px;
+    background: var(--vp-code-block-bg);
+    border-radius: var(--mdr-border-radius-size);
+    border: 2px solid v-bind('currentColorPallet?.borderColor2');
+    text-align: center;
+}
+
 .mdr-fullscreen-contents-frame{
     flex:1;
     margin-top: 5px;
@@ -1068,7 +1091,6 @@ const isValidExport = computed(()=>{
     overflow: auto;
     padding: 5px;
 }
-
 
 .mdr-fullscreen-contents-area{
     padding: 0;

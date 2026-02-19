@@ -213,8 +213,8 @@ graph LR
 
 ### Claude Code Opus 4.6に作成してもらったサンプル
 
-::: code-group
-```mermaid [縦向き] {title='フローチャートサンプル'}
+
+```mermaid [縦向き] {title='フローチャートサンプル (縦向き)'}
 flowchart TD
     A[開始] --> B{条件チェック}
     B -->|Yes| C[処理A実行]
@@ -236,7 +236,7 @@ flowchart TD
     N -->|No| P[終了]
     O --> P
 ```
-```mermaid [横向き] {title='フローチャートサンプル'}
+```mermaid [横向き] {title='フローチャートサンプル (横向き)'}
 flowchart LR
     A[開始] --> B{条件チェック}
     B -->|Yes| C[処理A実行]
@@ -258,7 +258,7 @@ flowchart LR
     N -->|No| P[終了]
     O --> P
 ```
-:::
+
 ## Deatilsでの使用
 
 ::: details 独自コンポーネント使用
