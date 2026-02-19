@@ -435,10 +435,6 @@ async function copyMarkdownCodeBlockCode() {
 ------------------------------------------------------------------------
 */
 
-
-const FullScreenContentsAreaElement = ref<HTMLElement>();
-const FullScreenDiagramAreaElement = ref<HTMLElement>();
-
 const visibleFullScreen = ref(false)
 let body_overflow_backup:string ="";
 
@@ -684,11 +680,9 @@ const isValidExport = computed(()=>{
                     </ul>
                 </div>
                 <div class="mdr-fullscreen-contents-frame">
-                    <div class="mdr-fullscreen-contents-area" ref="FullScreenContentsAreaElement">
-                        <div class="mdr-fullscreen-diagram-area" ref="FullScreenDiagramAreaElement" v-html="DiagramData"
-                            :class="{'mdr-fullscreen-diagram-area-diagram-fit' : EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen}"
-                        >                            
-                        </div>                        
+                    <div class="mdr-fullscreen-contents-area">
+                        <div class="mdr-fullscreen-diagram-area" v-html="DiagramData" 
+                            :class="{'mdr-fullscreen-diagram-area-diagram-fit' : EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen}" />                            
                     </div>
                 </div>
             </div>
@@ -728,8 +722,6 @@ const isValidExport = computed(()=>{
 .mdr-innerFrame-for-codegroup {
     margin: 5px;
 }
-
-
 
 
 /* コンテンツタブ */
@@ -825,11 +817,9 @@ const isValidExport = computed(()=>{
     border-radius: var(--mdr-border-radius-size);
 }
 
-
 /* タイトル */
 
 .mdr-diagram-title {
-
     background: v-bind('currentColorPallet?.backColor');
     border-radius: var(--mdr-border-radius-size);
     padding: 2px;
@@ -844,13 +834,10 @@ const isValidExport = computed(()=>{
     overflow: auto;
 }
 
-
 .mdr-diagram-max-height{
     max-height: v-bind(DiagramMaxHeightStr);
 }
-    
-
-
+   
 .mdr-diagram-drawArea{
     padding: 0;
     margin: 0;
@@ -971,9 +958,7 @@ const isValidExport = computed(()=>{
 
 
 /*
-
     Teleport : フルスクリーン
-
 */
 
 .mdr-fullscreen-overlay{
@@ -1081,13 +1066,11 @@ const isValidExport = computed(()=>{
 .mdr-fullscreen-diagram-area{
     padding: 0;
     margin: 0;
-    object-fit: contain;
     transform-origin: left top;
     transform: scale(calc(v-bind('FullScreenDiagramZoomRate') / 100));
 }
 
 .mdr-fullscreen-diagram-area-diagram-fit{
-    object-fit: none !important;
     width: v-bind('DrawAreaSizeForDiagramSizeMatch.minWidth');
     height: v-bind('DrawAreaSizeForDiagramSizeMatch.minHeight');
 }
