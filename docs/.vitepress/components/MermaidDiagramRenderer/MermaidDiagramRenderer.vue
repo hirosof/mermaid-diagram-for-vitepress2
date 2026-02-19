@@ -460,11 +460,6 @@ function openFullScreen(){
     document.body.style.overflow = "hidden";
     visibleFullScreen.value= true;
     document.addEventListener('keydown' , FullScreenOnKeyDown); 
-    nextTick(()=>{
-        if((FullScreenContentsAreaElement.value !=undefined) && (FullScreenDiagramAreaElement.value !=undefined)){
-
-        }
-    })
 }
 
 
