@@ -38,7 +38,7 @@ o  Prefix for VitePress npm scripts:
 ```
 
 ::: tip
-以後の手順は、VitePressのセットアップウィザードでセットアップした直後における操作の例を示したものである
+以後の手順は、VitePressのセットアップウィザードにて以上の内容でセットアップした直後における操作の例を示したものである
 :::
 
 ## インストール
@@ -48,6 +48,8 @@ npm install github:hirosof/mermaid-diagram-for-vitepress2
 ```
 
 ## 初期設定
+
+以下を参考に設定を行ってください。
 
 ### `docs\.vitepress\config.mts`
 
