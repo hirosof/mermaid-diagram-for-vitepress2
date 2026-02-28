@@ -23,7 +23,9 @@ export default withMermaidDiagramRenderer(
         '/guide/':[{
             text: 'ガイド',
             items:[
-              {text: 'トップ' , link:'/guide/'},           
+              {text: 'トップ' , link:'/guide/'},
+              {text:'導入手順書',link:'/guide/introduction'}
+              
             ]
           }
         ],
