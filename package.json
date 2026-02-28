@@ -34,7 +34,7 @@
     "docs:preview": "vitepress preview docs",
     "prepublishOnly": "npm run build",
     "typecheck": "vue-tsc --noEmit",
-    "postinstall":"npm run build"
+    "prepare": "npm run build --if-present"
   },
   "peerDependencies": {
     "mermaid": ">=10",
