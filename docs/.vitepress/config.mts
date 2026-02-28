@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitepress'
-import {withMermaidDiagramRenderer} from '../../src/index'
+import {withMermaidDiagramRenderer} from '../../src/configuration'
 
 // https://vitepress.dev/reference/site-config
 

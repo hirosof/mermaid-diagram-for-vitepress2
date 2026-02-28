@@ -6,7 +6,7 @@ import DefaultTheme from 'vitepress/theme'
 import './style.css'
 
 //追加するコンポーネント読み込み
-import {configureMDRTheme} from '../../../src/index'
+import {configureMDRTheme} from '../../../src/register'
 
 
 export default {

@@ -14,7 +14,9 @@ export default defineConfig({
   build: {
     lib: {
       entry: {
-        index: resolve(__dirname, 'src/index.ts')
+        configuration: resolve(__dirname, 'src/configuration.ts'),
+        exporter:resolve(__dirname,'src/exporter'),
+        register:resolve(__dirname,'src/register')
       },
       formats: ['es'],
     },

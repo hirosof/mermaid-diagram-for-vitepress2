@@ -4,10 +4,19 @@
   "description": "VitePress 2用のMermaid図描画コンポーネント",
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.mts",
-      "import": "./dist/index.mjs"
+    "./configuration": {
+      "types": "./dist/configuration.d.mts",
+      "import": "./dist/configuration.mjs"
+    },
+    "./exporter": {
+      "types": "./dist/exporter.d.mts",
+      "import": "./dist/exporter.mjs"
+    },
+    "./register": {
+      "types": "./dist/register.d.mts",
+      "import": "./dist/register.mjs"
     }
+
   },
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",

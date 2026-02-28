@@ -34,16 +34,3 @@ export function withMermaidDiagramRenderer(config: UserConfig): UserConfig {
     },
   }
 }
-
-// --- configureMDRTheme: テーマ登録ヘルパー ---
-import type { EnhanceAppContext } from 'vitepress'
-import MermaidDiagramRenderer from './components/MermaidDiagramRenderer.vue'
-
-export function configureMDRTheme({ app }: EnhanceAppContext) {
-  app.component('MermaidDiagramRenderer', MermaidDiagramRenderer)
-}
-
-// --- 型・定数のre-export ---
-export { MermaidDiagramRenderer }
-export { MDRDefaultConfig } from './config/MDRConfig'
-export type { MDRConfig } from './config/MDRConfig'
