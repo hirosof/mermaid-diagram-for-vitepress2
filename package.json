@@ -5,22 +5,19 @@
   "type": "module",
   "exports": {
     "./configuration": {
-      "types": "./dist/configuration.d.mts",
+      "types": "./dist/configuration.d.ts",
       "import": "./dist/configuration.mjs"
     },
     "./exporter": {
-      "types": "./dist/exporter.d.mts",
+      "types": "./dist/exporter.d.ts",
       "import": "./dist/exporter.mjs"
     },
     "./register": {
-      "types": "./dist/register.d.mts",
+      "types": "./dist/register.d.ts",
       "import": "./dist/register.mjs"
     }
 
   },
-  "main": "./dist/index.mjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
   "files": [
     "dist",
     "README.md",
