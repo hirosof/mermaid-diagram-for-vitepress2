@@ -16,7 +16,7 @@
       "types": "./dist/register.d.ts",
       "import": "./dist/register.mjs"
     },
-    "./style":"./mermaid-diagram-for-vitepress2.css"
+    "./style":"./dist/mermaid-diagram-for-vitepress2.css"
   },
   "files": [
     "dist",
