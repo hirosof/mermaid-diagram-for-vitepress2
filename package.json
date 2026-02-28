@@ -4,7 +4,7 @@
   "description": "VitePress 2用のMermaid図描画コンポーネント",
   "type": "module",
   "exports": {
-    "./configuration": {
+    ".": {
       "types": "./dist/configuration.d.ts",
       "import": "./dist/configuration.mjs"
     },
@@ -15,8 +15,8 @@
     "./register": {
       "types": "./dist/register.d.ts",
       "import": "./dist/register.mjs"
-    }
-
+    },
+    "./style.css":"./mermaid-diagram-for-vitepress2.css"
   },
   "files": [
     "dist",

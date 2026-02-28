@@ -141,3 +141,6 @@ vite.config.ts.timestamp-*
 # local
 local
 .claude
+
+# bad files
+nul
