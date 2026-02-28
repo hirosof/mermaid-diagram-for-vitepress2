@@ -6,7 +6,7 @@ import DefaultTheme from 'vitepress/theme'
 import './style.css'
 
 //追加するコンポーネント読み込み
-import {configureMDRTheme} from '../../../src/register'
+import { registerMermaidDiagramRendererComponent } from '../../../src/register'
 
 
 export default {
@@ -18,6 +18,6 @@ export default {
   },
   enhanceApp(ctx) {
     // ...
-    configureMDRTheme(ctx);
+    registerMermaidDiagramRendererComponent(ctx);
   }
 } satisfies Theme
