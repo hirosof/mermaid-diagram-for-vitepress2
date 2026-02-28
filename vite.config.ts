@@ -14,9 +14,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: {
-        index: resolve(__dirname, 'src/index.ts'),
-        client: resolve(__dirname, 'src/client/index.ts'),
-        node: resolve(__dirname, 'src/node/index.ts'),
+        index: resolve(__dirname, 'src/index.ts')
       },
       formats: ['es'],
     },

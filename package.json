@@ -7,14 +7,6 @@
     ".": {
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
-    },
-    "./client": {
-      "types": "./dist/client/index.d.mts",
-      "import": "./dist/client/index.mjs"
-    },
-    "./node": {
-      "types": "./dist/node/index.d.mts",
-      "import": "./dist/node/index.mjs"
     }
   },
   "main": "./dist/index.mjs",
@@ -47,6 +39,7 @@
     "vite-plugin-dts": "^4.0.0",
     "vitepress": "^2.0.0-alpha.16",
     "vue": "^3.5.0",
-    "vue-tsc": "^2.0.0"
+    "vue-tsc": "^2.0.0",
+    "@types/node": "^25.3.2"
   }
 }

@@ -6,7 +6,7 @@ import DefaultTheme from 'vitepress/theme'
 import './style.css'
 
 //追加するコンポーネント読み込み
-import MermaidDiagramRenderer from '../components/MermaidDiagramRenderer/MermaidDiagramRenderer.vue'
+import {configureMDRTheme} from '../../../src/index'
 
 
 export default {
@@ -16,10 +16,8 @@ export default {
       // https://vitepress.dev/guide/extending-default-theme#layout-slots
     })
   },
-  enhanceApp({ app, router, siteData }) {
+  enhanceApp(ctx) {
     // ...
-
-    //MermaidDiagramRendererの登録  
-    app.component("MermaidDiagramRenderer" , MermaidDiagramRenderer)
+    configureMDRTheme(ctx);
   }
 } satisfies Theme

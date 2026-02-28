@@ -22,7 +22,7 @@ let IsMermaidInitializedInDarkMode : boolean | null= null
 
 import { ref, computed, onMounted, watch, nextTick,useId, Ref, onUnmounted } from 'vue'
 import { useData } from 'vitepress'
-import { MDRDefaultConfig, type MDRConfig } from './MDRConfig'
+import { MDRDefaultConfig, type MDRConfig } from '../config/MDRConfig'
 import mermaid from 'mermaid';
 
 // 属性の取得

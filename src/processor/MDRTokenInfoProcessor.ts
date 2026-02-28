@@ -1,7 +1,7 @@
 
-import { MCLSParser, MCLSParser_getNamedParameterValue, MCLSParsedData } from '../../MCLSParser/MCLSParser'
+import { MCLSParser, MCLSParser_getNamedParameterValue, MCLSParsedData } from '../parser/MCLSParser'
 
-import { highlightMermaidCode } from '../../syntaxhighlight/mermaid-highlight'
+import { highlightMermaidCode } from '../syntaxhighlight/mermaid-highlight'
 
 export type MDRTokenInfoProcessedData = {
     bypass: boolean
