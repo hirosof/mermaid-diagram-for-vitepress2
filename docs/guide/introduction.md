@@ -43,6 +43,8 @@ o  Prefix for VitePress npm scripts:
 
 ## インストール
 
+以下を実行してください
+
 ```shell
 npm install github:hirosof/mermaid-diagram-for-vitepress2
 ```
@@ -54,6 +56,40 @@ npm install github:hirosof/mermaid-diagram-for-vitepress2
 ### `docs\.vitepress\config.mts`
 
 ::: code-group
+```typescript [差分表記]
+import { defineConfig } from 'vitepress'
+import { withMermaidDiagramRenderer } from 'mermaid-diagram-for-vitepress2' // [!code ++]
+
+// https://vitepress.dev/reference/site-config
+export default defineConfig({ // [!code --]
+const config = defineConfig({ // [!code ++]
+  title: "My Awesome Project",
+  description: "A VitePress Site",
+  themeConfig: {
+    // https://vitepress.dev/reference/default-theme-config
+    nav: [
+      { text: 'Home', link: '/' },
+      { text: 'Examples', link: '/markdown-examples' }
+    ],
+
+    sidebar: [
+      {
+        text: 'Examples',
+        items: [
+          { text: 'Markdown Examples', link: '/markdown-examples' },
+          { text: 'Runtime API Examples', link: '/api-examples' }
+        ]
+      }
+    ],
+
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
+    ]
+  }
+})
+
+export default withMermaidDiagramRenderer(config) // [!code ++]
+```
 ```typescript [設定前]
 import { defineConfig } from 'vitepress'
 
@@ -117,49 +153,35 @@ const config = defineConfig({
 
 export default withMermaidDiagramRenderer(config)
 ```
-
-```typescript [差分表記]
-import { defineConfig } from 'vitepress'
-import { withMermaidDiagramRenderer } from 'mermaid-diagram-for-vitepress2' // [!code ++]
-
-// https://vitepress.dev/reference/site-config
-export default defineConfig({ // [!code --]
-const config = defineConfig({ // [!code ++]
-  title: "My Awesome Project",
-  description: "A VitePress Site",
-  themeConfig: {
-    // https://vitepress.dev/reference/default-theme-config
-    nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' }
-    ],
-
-    sidebar: [
-      {
-        text: 'Examples',
-        items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
-        ]
-      }
-    ],
-
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
-    ]
-  }
-})
-
-export default withMermaidDiagramRenderer(config) // [!code ++]
-```
 :::
-
 
 
 ### `docs\.vitepress\theme\index.ts`
 
 
 ::: code-group
+```typescript [差分表記]
+// https://vitepress.dev/guide/custom-theme
+import { h } from 'vue'
+import type { Theme } from 'vitepress'
+import DefaultTheme from 'vitepress/theme'
+import './style.css'
+import {registerMermaidDiagramRendererComponent} from 'mermaid-diagram-for-vitepress2/register' // [!code ++]
+import 'mermaid-diagram-for-vitepress2/style' // [!code ++]
+
+export default {
+  extends: DefaultTheme,
+  Layout: () => {
+    return h(DefaultTheme.Layout, null, {
+      // https://vitepress.dev/guide/extending-default-theme#layout-slots
+    })
+  },
+  enhanceApp({ app, router, siteData }) {
+    // ...
+    registerMermaidDiagramRendererComponent({app , router ,siteData}); // [!code ++]
+  }
+} satisfies Theme
+```
 ```typescript [設定前]
 // https://vitepress.dev/guide/custom-theme
 import { h } from 'vue'
@@ -178,7 +200,6 @@ export default {
     // ...
   }
 } satisfies Theme
-
 ```
 ```typescript [設定後]
 // https://vitepress.dev/guide/custom-theme
@@ -202,30 +223,6 @@ export default {
   }
 } satisfies Theme
 ```
-
-```typescript [差分表記]
-// https://vitepress.dev/guide/custom-theme
-import { h } from 'vue'
-import type { Theme } from 'vitepress'
-import DefaultTheme from 'vitepress/theme'
-import './style.css'
-import {registerMermaidDiagramRendererComponent} from 'mermaid-diagram-for-vitepress2/register' // [!code ++]
-import 'mermaid-diagram-for-vitepress2/style' // [!code ++]
-
-export default {
-  extends: DefaultTheme,
-  Layout: () => {
-    return h(DefaultTheme.Layout, null, {
-      // https://vitepress.dev/guide/extending-default-theme#layout-slots
-    })
-  },
-  enhanceApp({ app, router, siteData }) {
-    // ...
-    registerMermaidDiagramRendererComponent({app , router ,siteData}); // [!code ++]
-  }
-} satisfies Theme
-
-```
 :::
 
 
@@ -239,7 +236,7 @@ export default {
 以下のように、mermaidの言語を指定してください。
 
 ::: code-group
-````markdown [Markdownのコードブロック]
+````markdown [Markdownに記載するコードブロック]
 ```mermaid
 graph TD
     A --> B
@@ -249,7 +246,7 @@ graph TD
 ```
 ````
 
-```mermaid [結果]
+```mermaid [結果例]
 graph TD
     A --> B
     C --> D
@@ -258,3 +255,7 @@ graph TD
 ```
 :::
 
+
+::: tip
+表示される結果の構成は、設定の内容によって異なる場合があります。
+:::
