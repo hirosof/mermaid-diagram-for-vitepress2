@@ -15,6 +15,10 @@ export function withMermaidDiagramRenderer(config: UserConfig): UserConfig {
         ...config.vite?.ssr,
         noExternal: true
       },
+      build:{
+        ...config.vite?.build,
+        chunkSizeWarningLimit:650
+      }
     },
     markdown: {
       ...config.markdown,
