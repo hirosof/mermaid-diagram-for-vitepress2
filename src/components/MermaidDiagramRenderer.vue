@@ -179,18 +179,6 @@ let   DiagramGeneratedNumber = 0;
 const DiagramDrawTargetElement = ref<HTMLElement>();
 
 const EnableDrawAreaBaseSizeFitByDiagramSize = ref(false);
-const DrawAreaSizeForDiagramSizeMatch = computed(()=>{
-    if(!DiagramSize.value) return {};
-    return {
-        minWidth : `${DiagramSize.value.width}px`,
-        minHeight : `${DiagramSize.value.height}px`
-    }
-})
-
-const DrawAreaSize = computed(()=>{
-    if(!EnableDrawAreaBaseSizeFitByDiagramSize.value) return {};
-    return DrawAreaSizeForDiagramSizeMatch.value;
-})
 
 
 const EnableDiagramDrawAreaMaxHeight = ref(true);
@@ -199,6 +187,15 @@ const MermaidCode = decodeURIComponent(props.code);
 const DiagramTitle = (props.title.length>0) ? decodeURIComponent(props.title) : "";
 const DiagramData = ref('')
 const DiagramSize = ref<MDRSize>();
+
+const DiagramSizeWithUnit = computed(()=>{
+    if(!DiagramSize.value) return {};
+    return {
+        width : `${DiagramSize.value.width}px`,
+        height : `${DiagramSize.value.height}px`
+    }
+})
+
 const MermaidException = ref('');
 
 
@@ -606,7 +603,8 @@ const isValidExport = computed(()=>{
                         'mdr-diagram-max-height': (config.DiagramMaxHeight !=0) && EnableDiagramDrawAreaMaxHeight
                     }">
                 
-                    <div class="mdr-diagram-drawArea" v-html="DiagramData" ref="DiagramDrawTargetElement" v-if="(DiagramData.length > 0)" :style="DrawAreaSize"/>
+                    <div class="mdr-diagram-drawArea" v-html="DiagramData" ref="DiagramDrawTargetElement" v-if="(DiagramData.length > 0)" 
+                        :class="{'mdr-diagram-drawArea-diagram-fit':EnableDrawAreaBaseSizeFitByDiagramSize}"/>
 
                     <div class="mdr-diagram-drawArea" style="color:red" v-if="(DiagramData.length==0) && (MermaidException.length>0)">
                         Mermaid render error : {{ MermaidException }}
@@ -865,6 +863,12 @@ const isValidExport = computed(()=>{
     margin: 0;
 }
 
+.mdr-diagram-drawArea-diagram-fit{
+    min-width: v-bind('DiagramSizeWithUnit.width');
+    min-height: v-bind('DiagramSizeWithUnit.height');
+}
+
+
 /* コードブロック */
 
 .mdr-code-block {
@@ -1105,8 +1109,8 @@ const isValidExport = computed(()=>{
 }
 
 .mdr-fullscreen-diagram-area-diagram-fit{
-    width: v-bind('DrawAreaSizeForDiagramSizeMatch.minWidth');
-    height: v-bind('DrawAreaSizeForDiagramSizeMatch.minHeight');
+    min-width: v-bind('DiagramSizeWithUnit.width');
+    min-height: v-bind('DiagramSizeWithUnit.height');
 }
 
 </style>
