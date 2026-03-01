@@ -9,6 +9,13 @@ export function withMermaidDiagramRenderer(config: UserConfig): UserConfig {
 
   return {
     ...config,
+    vite: {
+      ...config.vite,
+      ssr: {
+        ...config.vite?.ssr,
+        noExternal: true
+      },
+    },
     markdown: {
       ...config.markdown,
       shikiSetup(shiki) {
