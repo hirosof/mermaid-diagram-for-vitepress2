@@ -525,10 +525,28 @@ const isValidMermaidCode = computed(()=>{
     return MermaidCode.length > 0;
 })
 
-const isValidExport = computed(()=>{
-    return isValidDiagramData.value || isValidMermaidCode.value;
-});
 
+const isValidExportCopy = computed(()=>{
+    switch(config.value.AvailableExportType){
+        case 'Copy':
+        case 'Both':
+            return  isValidMermaidCode.value;
+    }
+})
+
+const isValidExportDownload = computed(()=>{
+    switch(config.value.AvailableExportType){
+        case 'Download':
+        case 'Both':
+            return  isValidMermaidCode.value;
+    }
+})
+
+
+const isValidExport = computed(()=>{
+    if(config.value.AvailableExportType === 'None') return false;    
+    return isValidExportCopy.value || isValidExportDownload.value;
+})
 
 </script>
 
@@ -621,7 +639,7 @@ const isValidExport = computed(()=>{
 
                 <div class="mdr-exports" v-if="currentContentType==='Exports'">
                     <ul>
-                        <li><div>ダウンロード</div>
+                        <li v-if="isValidExportDownload"><div>ダウンロード</div>
                             <ul>
                                 <li @click="downloadSvg()">
                                     SVG
@@ -640,7 +658,7 @@ const isValidExport = computed(()=>{
                                 </li>
                             </ul>
                         </li>
-                        <li><div>{{ eitherCopiedMark }}コピー</div>
+                        <li v-if="isValidExportCopy"><div>{{ eitherCopiedMark }}コピー</div>
                             <ul>
                                 <li @click="copyMermaidSVG()">
                                     SVG

@@ -19,6 +19,7 @@ export type MDRConfig = {
     ShowDiagramTitle:boolean;
     DiagramMaxHeight:number;
     CodeMaxHeight:number;
+    AvailableExportType:'None' | 'Download' | 'Copy' | 'Both'
 }
 
 
@@ -34,7 +35,8 @@ export const MDRDefaultConfig :MDRConfig = {
     ShowDiagramTitle:true,
     ShowTypeSwitchType:'Tab',
     DiagramMaxHeight:300,
-    CodeMaxHeight:300
+    CodeMaxHeight:300,
+    AvailableExportType:'Both'
 }
 
 
