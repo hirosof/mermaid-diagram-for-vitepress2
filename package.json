@@ -8,6 +8,10 @@
       "types": "./dist/configuration.d.ts",
       "import": "./dist/configuration.mjs"
     },
+    "./MDRConfig": {
+      "types": "./dist/config/MDRConfig.d.ts",
+      "import": "./dist/config/MDRConfig.mjs"
+    },
     "./exporter": {
       "types": "./dist/exporter.d.ts",
       "import": "./dist/exporter.mjs"
