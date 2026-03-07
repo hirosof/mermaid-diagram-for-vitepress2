@@ -2,6 +2,7 @@ import type { UserConfig } from 'vitepress'
 import { mermaidLang } from './syntaxhighlight/mermaid-lang'
 import { setHighlighter } from './syntaxhighlight/mermaid-highlight'
 import { MDRTokenInfoProcessor } from './processor/MDRTokenInfoProcessor'
+import './config/MDRConfig'
 
 export function withMermaidDiagramRenderer(config: UserConfig): UserConfig {
   const originalShikiSetup = config.markdown?.shikiSetup
