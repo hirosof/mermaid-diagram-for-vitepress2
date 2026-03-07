@@ -49,10 +49,12 @@ export default withMermaidDiagramRenderer(
           }
         ]      
       },
-
       socialLinks: [
         { icon: 'github', link: 'https://github.com/hirosof/mermaid-diagram-for-vitepress2' }
-      ]
+      ],
+      MDRConfig:{
+        InitShowType:'Diagram'
+      }
     }
   })
 )

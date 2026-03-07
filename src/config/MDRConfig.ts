@@ -10,9 +10,9 @@ import 'vitepress'
  * MermaidDiagramRendererコンポーネントの設定コレクション
  * 
  * @export
- * @typedef {MDRConfig}
+ * @typedef {MDRConfigType}
  */
-export type MDRConfig = {
+export type MDRConfigType = {
     InitShowType : 'Diagram' | 'Code';
     ShowTypeSwitchType : 'Tab' | 'Swap';
     InitShowCodeLineNumbers : boolean;
@@ -27,9 +27,9 @@ export type MDRConfig = {
  * MermaidDiagramRendererコンポーネントのデフォルト設定
  * @export
  * @const MDRDefaultConfig
- * @type {MDRConfig}
+ * @type {MDRConfigType}
  */
-export const MDRDefaultConfig :MDRConfig = {
+export const MDRDefaultConfig :MDRConfigType = {
     InitShowType:'Diagram',
     InitShowCodeLineNumbers:true,
     ShowDiagramTitle:true,
@@ -48,7 +48,7 @@ declare module 'vitepress' {
   namespace DefaultTheme {
     interface Config {
         // 追加: MermaidDiagramRendererコンポーネントの設定
-        MDRConfig?: Partial<MDRConfig>
+        MDRConfig?: Partial<MDRConfigType>
     }
   }
 }

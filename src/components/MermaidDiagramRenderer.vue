@@ -22,7 +22,7 @@ let IsMermaidInitializedInDarkMode : boolean | null= null
 
 import { ref, computed, onMounted, watch, nextTick,useId, Ref, onUnmounted } from 'vue'
 import { useData } from 'vitepress'
-import { MDRDefaultConfig, type MDRConfig } from '../config/MDRConfig'
+import { MDRDefaultConfig, type MDRConfigType } from '../config/MDRConfig'
 import mermaid from 'mermaid';
 
 // 属性の取得
@@ -38,7 +38,7 @@ const props = defineProps<{
 const { isDark, theme } = useData()
 
 // 設定の取得
-const config = computed<MDRConfig>(() => ({
+const config = computed<MDRConfigType>(() => ({
     ...MDRDefaultConfig,
     ...(theme.value.MDRConfig ?? {}),
 }))
