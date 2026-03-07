@@ -59,6 +59,7 @@ npm install github:hirosof/mermaid-diagram-for-vitepress2
 ```typescript [差分表記]
 import { defineConfig } from 'vitepress'
 import { withMermaidDiagramRenderer } from 'mermaid-diagram-for-vitepress2' // [!code ++]
+import 'mermaid-diagram-for-vitepress2/MDRConfig' // [!code ++]
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({ // [!code --]
@@ -123,6 +124,7 @@ export default defineConfig({
 ```typescript [設定後]
 import { defineConfig } from 'vitepress'
 import { withMermaidDiagramRenderer } from 'mermaid-diagram-for-vitepress2'
+import 'mermaid-diagram-for-vitepress2/MDRConfig'
 
 // https://vitepress.dev/reference/site-config
 const config = defineConfig({
@@ -155,6 +157,12 @@ export default withMermaidDiagramRenderer(config)
 ```
 :::
 
+::: info
+すべて初期設定の状態で問題ない場合、以下の記載は無くても問題ありません。
+```ts
+import 'mermaid-diagram-for-vitepress2/MDRConfig'
+```
+:::
 
 ### `docs\.vitepress\theme\index.ts`
 
