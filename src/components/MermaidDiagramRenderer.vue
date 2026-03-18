@@ -782,6 +782,7 @@ const isValidExport = computed(()=>{
     padding: 5px 10px;
     text-align: center;
     border-right: 1px solid v-bind('currentColorPallet?.borderColor');
+    user-select: none;
 }
 
 .mdr-content-tab-item:last-of-type {
@@ -830,6 +831,7 @@ const isValidExport = computed(()=>{
     text-align: center;
     border: 2px solid v-bind('currentColorPallet?.borderColor');
     border-radius: var(--mdr-border-radius-size);
+    user-select: none;
 }
 
 @media (hover: hover){
@@ -939,6 +941,10 @@ const isValidExport = computed(()=>{
     overflow: auto;
 } 
 
+.mdr-exports li{
+    user-select: none;
+}
+
 .mdr-exports > ul{
     list-style: none;
     margin: 0;
@@ -1022,9 +1028,9 @@ const isValidExport = computed(()=>{
 .mdr-fullscreen-wall{
 
     width: 98vw;
-    height: 95vh;
+    height: 98vh;
     max-width: 98vw;
-    max-height: 95vh;
+    max-height: 98vh;
     
     margin: 0;
     padding: 5px;
@@ -1037,9 +1043,9 @@ const isValidExport = computed(()=>{
 
     /* dvw , dvh 対応環境用 */
     width: 98dvw;
-    height: 95dvh; 
+    height: 98dvh; 
     max-width: 98dvw;
-    max-height: 95dvh;
+    max-height: 98dvh;
 }
 
 .mdr-fullscreen-general-menu-frame {
@@ -1058,7 +1064,7 @@ const isValidExport = computed(()=>{
 
 .mdr-fullscreen-general-menu li{
     margin: 0 2.5px;
-    padding: 10px 5px;
+    padding: 8px 5px;
     text-align: center;
     min-width: 64px;
     line-height: 25px;
