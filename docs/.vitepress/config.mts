@@ -41,11 +41,21 @@ export default withMermaidDiagramRenderer(
             text: '実験場',
             items:[
               {text: 'トップ' , link:'/experiments/'},
-              {text:'バイパスモード',link:'/experiments/bypass_mode'},
-              {text:'コードグループ',link:'/experiments/code_group'},
-              {text:'MermaidサンプルA' , link:'/experiments/mermaid-samples-by-claude'},
-              {text:'MermaidサンプルB' , link:'/experiments/mermaid-large-samples-by-claude'},
-              {text:'Mermaid XY Chart サンプル集',link:'/experiments/mermaid-xychart-samples-by-claude'}
+              {
+                text:'ケースごとの動作確認',
+                items:[
+                  {text:'バイパスモード',link:'/experiments/bypass_mode'},
+                  {text:'コードグループでの使用',link:'/experiments/code_group'},
+                ]
+              },
+              {
+                text:'AI生成サンプル' ,
+                items:[
+                  {text:'MermaidサンプルA' , link:'/experiments/mermaid-samples-by-claude'},
+                  {text:'MermaidサンプルB' , link:'/experiments/mermaid-large-samples-by-claude'},
+                  {text:'Mermaid XY Chart サンプル集',link:'/experiments/mermaid-xychart-samples-by-claude'}
+                ]
+              }
             ]
           }
         ]      
