@@ -699,7 +699,7 @@ const isValidExport = computed(()=>{
                         </li>      
 
                         <li @click="FullScreenContentType = (FullScreenContentType == 'Diagram') ? 'Code' : 'Diagram'">
-                            表示切替
+                            表示内容切替
                         </li>
 
                         <li @click="closeFullScreen()">
