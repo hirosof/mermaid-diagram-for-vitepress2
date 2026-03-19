@@ -54,7 +54,7 @@ const SelfID = useId()
 
 const mdr_frame_container = ref<HTMLElement>();
 const isThisCodeGroupElement = ref<boolean>(false);
-const initCSSLineNumber = ref((props.startLineNumbers != null) ? Number(props.startLineNumbers) - 1 : 1)
+const initCSSLineNumber = ref((props.startLineNumbers != null) ? Number(props.startLineNumbers) - 1 : 0)
 const DiagramMaxHeightStr = (config.value.DiagramMaxHeight != 0) ? config.value.DiagramMaxHeight+"px" : "none";
 const CodeMaxHeightStr = (config.value.CodeMaxHeight != 0) ? config.value.CodeMaxHeight+"px" : "none";
 
