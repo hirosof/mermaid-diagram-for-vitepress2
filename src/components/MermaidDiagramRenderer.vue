@@ -440,7 +440,8 @@ let body_position_backup : string = "";
 let body_top_backup : string = "";
 let window_scroll_backup_Y : number = 0;
 
-//scrollMargin
+const FullScreenContentType = ref<'Diagram'|'Code'>('Diagram');
+
 const FullScreenDiagramZoomRateMin = 50;
 const InitializedFullScreenDiagramZoomRate = 100;
 const FullScreenDiagramZoomRateMax = 500;
@@ -449,12 +450,17 @@ const FullScreenDiagramZoomRate = ref(InitializedFullScreenDiagramZoomRate);
 const EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen = ref<boolean|null>(null)
 
 
-function openFullScreen(){
+const ShowCodeBlockLineNumbersForFullScreen = ref(ShowCodeBlockLineNumbers);
+
+function openFullScreen(contentType : 'Diagram'|'Code'){
     document.addEventListener('keydown' , FullScreenOnKeyDown); 
 
     if(EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen.value == null){
         EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen.value = EnableDrawAreaBaseSizeFitByDiagramSize.value;
     }
+
+    ShowCodeBlockLineNumbersForFullScreen.value = ShowCodeBlockLineNumbers.value;
+    FullScreenContentType.value = contentType;
 
     window_scroll_backup_Y = window.pageYOffset;
     body_top_backup = document.body.style.top;
@@ -590,7 +596,7 @@ const isValidExport = computed(()=>{
                     <div class="mdr-operation-panel-button" @click="EnableDrawAreaBaseSizeFitByDiagramSize = !EnableDrawAreaBaseSizeFitByDiagramSize">
                         {{(EnableDrawAreaBaseSizeFitByDiagramSize) ? "幅基準：ダイアグラム" : "幅基準：描画領域"}}
                     </div>
-                    <div class="mdr-operation-panel-button" @click="openFullScreen();">⛶</div>
+                    <div class="mdr-operation-panel-button" @click="openFullScreen('Diagram');">⛶</div>
                 </div>
  
             </div>
@@ -604,6 +610,7 @@ const isValidExport = computed(()=>{
                     <div class="mdr-operation-panel-button" @click="EnableCodeBlockAreaMaxSize = !EnableCodeBlockAreaMaxSize">
                         高さ制限{{ EnableCodeBlockAreaMaxSize?'解除':'設定' }}
                     </div>
+                    <div class="mdr-operation-panel-button" @click="openFullScreen('Code');">⛶</div>
 
                 </div>
 
@@ -682,8 +689,17 @@ const isValidExport = computed(()=>{
             <div class="mdr-fullscreen-wall">
                 <div class="mdr-fullscreen-general-menu-frame">
                      <ul class="mdr-fullscreen-general-menu mdr-fullscreen-system-menu">
-                        <li @click="EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen = !EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen">
+                        <li @click="EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen = !EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen"
+                            v-if="FullScreenContentType=='Diagram'">
                             {{(EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen) ? "幅基準：ダイアグラム" : "幅基準：描画領域"}}
+                        </li>
+
+                        <li @click="ShowCodeBlockLineNumbersForFullScreen = !ShowCodeBlockLineNumbersForFullScreen" v-if="FullScreenContentType=='Code'">
+                            行番号を{{ ShowCodeBlockLineNumbersForFullScreen ? '隠す' : '表示する'}}
+                        </li>      
+
+                        <li @click="FullScreenContentType = (FullScreenContentType == 'Diagram') ? 'Code' : 'Diagram'">
+                            表示切替
                         </li>
 
                         <li @click="closeFullScreen()">
@@ -691,7 +707,7 @@ const isValidExport = computed(()=>{
                         </li>
                     </ul>
                 </div>
-                <div class="mdr-fullscreen-general-menu-frame">
+                <div class="mdr-fullscreen-general-menu-frame" v-if="FullScreenContentType=='Diagram'">
                     <ul class="mdr-fullscreen-general-menu mdr-fullscreen-operation-menu">
                          <li @click="SetFullScreenDiagramZoomRate(FullScreenDiagramZoomRateMin)">
                            最小
@@ -719,8 +735,14 @@ const isValidExport = computed(()=>{
                 <div class="mdr-fullscreen-contents-frame">
 
                     <div class="mdr-fullscreen-contents-area">
-                        <div class="mdr-fullscreen-diagram-area" v-html="DiagramData" 
-                            :class="{'mdr-fullscreen-diagram-area-diagram-fit' : EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen}" />                            
+                        <div class="mdr-fullscreen-diagram-area" v-html="DiagramData"  v-if="FullScreenContentType=='Diagram'"
+                            :class="{'mdr-fullscreen-diagram-area-diagram-fit' : EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen}" />     
+                        
+                        <div class="mdr-code-block" v-html="MermaidHighlightedCode" v-if="FullScreenContentType === 'Code'"
+                            :class="{ 
+                                'mdr-code-block-with-line-numbers': ShowCodeBlockLineNumbersForFullScreen,
+                            }" />
+                        
                     </div>
                 </div>
             </div>
