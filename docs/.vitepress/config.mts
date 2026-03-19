@@ -44,8 +44,8 @@ export default withMermaidDiagramRenderer(
               {text:'バイパスモード',link:'/experiments/bypass_mode'},
               {text:'コードグループ',link:'/experiments/code_group'},
               {text:'MermaidサンプルA' , link:'/experiments/mermaid-samples-by-claude'},
-              {text:'MermaidサンプルB' , link:'/experiments/mermaid-large-samples-by-claude'}
-
+              {text:'MermaidサンプルB' , link:'/experiments/mermaid-large-samples-by-claude'},
+              {text:'Mermaid XY Chart サンプル集',link:'/experiments/mermaid-xychart-samples-by-claude'}
             ]
           }
         ]      
