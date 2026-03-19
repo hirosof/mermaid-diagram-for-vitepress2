@@ -4,8 +4,6 @@ MermaidDiagramRendererコンポーネント
 ======================================================================
 --------------------------------------------------------------------->
 
-
-
 <!--------------------------------------------------------------------
     グローバル設定
 --------------------------------------------------------------------->
@@ -20,7 +18,7 @@ let IsMermaidInitializedInDarkMode : boolean | null= null
 --------------------------------------------------------------------->
 <script setup lang="ts">
 
-import { ref, computed, onMounted, watch, nextTick,useId, Ref, onUnmounted } from 'vue'
+import { ref, computed, onMounted, watch, nextTick,useId, onUnmounted } from 'vue'
 import { useData } from 'vitepress'
 import { MDRDefaultConfig, type MDRConfigType } from '../config/MDRConfig'
 import mermaid from 'mermaid';
@@ -157,7 +155,7 @@ const currentColorPallet= computed<ColorPaletteType>(()=>{
 // テーマ切り替え時の処理
 async function onChangeTheme() {
     await InitializeMermaid();
-    renderDiagram()
+    await renderDiagram()
 }
 
 
@@ -200,6 +198,9 @@ const MermaidException = ref('');
 
 
 async function InitializeMermaid(){
+
+    if(IsMermaidInitializedInDarkMode == isDark.value) return;
+
     mermaid.initialize({
         startOnLoad: false,
         theme: isDark.value ? 'dark' : 'default',
@@ -257,7 +258,7 @@ function getSVGSize(target_svg : string , areaSizeForFailedGotSVGRealSize : MDRS
     if(!svg_element) return null;
 
     let realAreaSize = areaSizeForFailedGotSVGRealSize;
-    if((DiagramDrawTargetElement !=null)&&(DiagramDrawTargetElement.value !=null)){
+    if(DiagramDrawTargetElement.value !=null){
         realAreaSize={
             width : DiagramDrawTargetElement.value.clientWidth,
             height : DiagramDrawTargetElement.value.clientHeight
@@ -347,10 +348,14 @@ function downloadPng(isTransparent : boolean) {
 
             const img = new Image()
             img.onload = () => {
-                ctx.drawImage(img, 0, 0, width, height)
-                canvas.toBlob((blob) => {
-                    if (blob) triggerDownload(blob, getDownloadFileNameBase() + ".png")
-                }, 'image/png')
+                try{
+                    ctx.drawImage(img, 0, 0, width, height)
+                    canvas.toBlob((blob) => {
+                        if (blob) triggerDownload(blob, getDownloadFileNameBase() + ".png")
+                    }, 'image/png')
+                }catch(e){
+                    console.error("Image.onload Callback (downloadPng) Process Error ： " + e);
+                }
             }
             img.src = dataUrl
         }else{
@@ -375,11 +380,12 @@ function downloadMarkdownCodeBlockCodeFile(){
 
 function triggerDownload(blob: Blob, filename: string) {
     const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
+    const url = URL.createObjectURL(blob);
+    a.href = url;
     a.download = filename
     a.click()
     a.remove()
-    URL.revokeObjectURL(a.href)   
+    URL.revokeObjectURL(url)   
 }
 
 /*
@@ -450,7 +456,7 @@ const FullScreenDiagramZoomRate = ref(InitializedFullScreenDiagramZoomRate);
 const EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen = ref<boolean|null>(null)
 
 
-const ShowCodeBlockLineNumbersForFullScreen = ref(ShowCodeBlockLineNumbers);
+const ShowCodeBlockLineNumbersForFullScreen = ref(ShowCodeBlockLineNumbers.value);
 
 function openFullScreen(contentType : 'Diagram'|'Code'){
     document.addEventListener('keydown' , FullScreenOnKeyDown); 
@@ -538,6 +544,7 @@ const isValidExportCopy = computed(()=>{
         case 'Both':
             return  isValidMermaidCode.value;
     }
+    return false;
 })
 
 const isValidExportDownload = computed(()=>{
@@ -546,6 +553,7 @@ const isValidExportDownload = computed(()=>{
         case 'Both':
             return  isValidMermaidCode.value;
     }
+    return false;
 })
 
 
@@ -628,10 +636,10 @@ const isValidExport = computed(()=>{
                         'mdr-diagram-max-height': (config.DiagramMaxHeight !=0) && EnableDiagramDrawAreaMaxHeight
                     }">
                 
-                    <div class="mdr-diagram-drawArea" v-html="DiagramData" ref="DiagramDrawTargetElement" v-if="(DiagramData.length > 0)" 
+                    <div class="mdr-diagram-drawArea" v-html="DiagramData" ref="DiagramDrawTargetElement" v-if="isValidDiagramData" 
                         :class="{'mdr-diagram-drawArea-diagram-fit':EnableDrawAreaBaseSizeFitByDiagramSize}"/>
 
-                    <div class="mdr-diagram-drawArea" style="color:red" v-if="(DiagramData.length==0) && (MermaidException.length>0)">
+                    <div class="mdr-diagram-drawArea" style="color:red" v-if="isValidDiagramData && (MermaidException.length>0)">
                         Mermaid render error : {{ MermaidException }}
                     </div>
 
@@ -728,7 +736,7 @@ const isValidExport = computed(()=>{
                 </div> 
 
                 <div class="mdr-fullscreen-diagram-title-frame" v-if="isShowDiagramTitle">
-                    <div class="mdr-fullscreen-diagram-title" v-if="isShowDiagramTitle">
+                    <div class="mdr-fullscreen-diagram-title">
                         {{ DiagramTitle }}
                     </div>
                 </div>
@@ -759,7 +767,7 @@ const isValidExport = computed(()=>{
 
 .mdr-common-style-border-top {
     margin-top: 5px;
-    border-top: 1px solid v-bind('currentColorPallet?.borderColor');
+    border-top: 1px solid v-bind('currentColorPallet.borderColor');
 }
 
 /* フレーム */
@@ -773,10 +781,10 @@ const isValidExport = computed(()=>{
     margin: 0;
 
     padding: 5px;
-    border: 2px solid v-bind('currentColorPallet?.borderColor');
+    border: 2px solid v-bind('currentColorPallet.borderColor');
     border-radius: var(--mdr-border-radius-size);
-    background: v-bind('currentColorPallet?.backColor');
-    color: v-bind('currentColorPallet?.frontColor');
+    background: v-bind('currentColorPallet.backColor');
+    color: v-bind('currentColorPallet.frontColor');
 }
 
 .mdr-innerFrame-for-codegroup {
@@ -787,14 +795,14 @@ const isValidExport = computed(()=>{
 /* コンテンツタブ */
 
 .mdr-content-tab-frame {
-    border-bottom: 1px solid v-bind('currentColorPallet?.borderColor');
+    border-bottom: 1px solid v-bind('currentColorPallet.borderColor');
     min-height: 30px;
     display: flex;
 }
 
 .mdr-content-tab {
     margin: 5px;
-    border: 2px solid v-bind('currentColorPallet?.borderColor');
+    border: 2px solid v-bind('currentColorPallet.borderColor');
     display: flex;
     border-radius: var(--mdr-border-radius-size);
     overflow: hidden;
@@ -803,7 +811,7 @@ const isValidExport = computed(()=>{
 .mdr-content-tab-item {
     padding: 5px 10px;
     text-align: center;
-    border-right: 1px solid v-bind('currentColorPallet?.borderColor');
+    border-right: 1px solid v-bind('currentColorPallet.borderColor');
     user-select: none;
 }
 
@@ -813,28 +821,28 @@ const isValidExport = computed(()=>{
 
 @media (hover: hover){
     .mdr-content-tab-item:hover {
-        background: v-bind('currentColorPallet?.itemHoverBackColor');
-        color: v-bind('currentColorPallet?.itemHoverFrontColor');
+        background: v-bind('currentColorPallet.itemHoverBackColor');
+        color: v-bind('currentColorPallet.itemHoverFrontColor');
         cursor: pointer;
     }
 }
 
 .mdr-content-tab-item:active {
-    background: v-bind('currentColorPallet?.itemHoverBackColor');
-    color: v-bind('currentColorPallet?.itemHoverFrontColor');
+    background: v-bind('currentColorPallet.itemHoverBackColor');
+    color: v-bind('currentColorPallet.itemHoverFrontColor');
     cursor: pointer;
 }
 
 
 .mdr-content-tab-item-actived {
-    background: v-bind('currentColorPallet?.activedItemBackColor');
-    color: v-bind('currentColorPallet?.activedItemFrontColor');
+    background: v-bind('currentColorPallet.activedItemBackColor');
+    color: v-bind('currentColorPallet.activedItemFrontColor');
 }
 
 /* 操作パネル */
 
 .mdr-operation-panel-frame {
-    border-bottom: 1px solid v-bind('currentColorPallet?.borderColor');
+    border-bottom: 1px solid v-bind('currentColorPallet.borderColor');
     min-height: 30px;
     display: flex;
 }
@@ -851,22 +859,22 @@ const isValidExport = computed(()=>{
     padding: 5px 5px;
     margin: 0 2.5px;
     text-align: center;
-    border: 2px solid v-bind('currentColorPallet?.borderColor');
+    border: 2px solid v-bind('currentColorPallet.borderColor');
     border-radius: var(--mdr-border-radius-size);
     user-select: none;
 }
 
 @media (hover: hover){
     .mdr-operation-panel-button:hover {
-        background: v-bind('currentColorPallet?.itemHoverBackColor');
-        color: v-bind('currentColorPallet?.itemHoverFrontColor');
+        background: v-bind('currentColorPallet.itemHoverBackColor');
+        color: v-bind('currentColorPallet.itemHoverFrontColor');
         cursor: pointer;
     }
 }
 
 .mdr-operation-panel-button:active {
-    background: v-bind('currentColorPallet?.itemHoverBackColor');
-    color: v-bind('currentColorPallet?.itemHoverFrontColor');
+    background: v-bind('currentColorPallet.itemHoverBackColor');
+    color: v-bind('currentColorPallet.itemHoverFrontColor');
     cursor: pointer;
 }
 
@@ -882,10 +890,10 @@ const isValidExport = computed(()=>{
 /* タイトル */
 
 .mdr-diagram-title {
-    background: v-bind('currentColorPallet?.backColor');
+    background: v-bind('currentColorPallet.backColor');
     border-radius: var(--mdr-border-radius-size);
     padding: 2px;
-    border: 2px solid v-bind('currentColorPallet?.borderColor');
+    border: 2px solid v-bind('currentColorPallet.borderColor');
     text-align: center;
 }
 
@@ -984,7 +992,7 @@ const isValidExport = computed(()=>{
     margin: 5px;
     padding: 5px;
     flex-grow: 1;
-    background: v-bind('currentColorPallet?.backColor');
+    background: v-bind('currentColorPallet.backColor');
     border-radius: var(--mdr-border-radius-size);
 }
 
@@ -994,7 +1002,7 @@ const isValidExport = computed(()=>{
 }
 
 .mdr-exports > ul > li > ul{
-    background: v-bind('currentColorPallet?.backColor2');
+    background: v-bind('currentColorPallet.backColor2');
     text-align: left;
     list-style: none;
     margin: 4px;
@@ -1006,7 +1014,7 @@ const isValidExport = computed(()=>{
 .mdr-exports > ul > li > ul > li{
     padding: 5px;
     margin: 0;
-    border-bottom: 1px solid v-bind('currentColorPallet?.borderColor');
+    border-bottom: 1px solid v-bind('currentColorPallet.borderColor');
 }
 
 .mdr-exports > ul > li > ul > li:last-of-type{
@@ -1016,15 +1024,15 @@ const isValidExport = computed(()=>{
 
 @media (hover: hover){
     .mdr-exports > ul > li > ul > li:hover {
-        background: v-bind('currentColorPallet?.itemHoverBackColor');
-        color: v-bind('currentColorPallet?.itemHoverFrontColor');
+        background: v-bind('currentColorPallet.itemHoverBackColor');
+        color: v-bind('currentColorPallet.itemHoverFrontColor');
         cursor: pointer;
     }
 }
 
 .mdr-exports > ul > li > ul > li:active {
-    background: v-bind('currentColorPallet?.itemHoverBackColor');
-    color: v-bind('currentColorPallet?.itemHoverFrontColor');
+    background: v-bind('currentColorPallet.itemHoverBackColor');
+    color: v-bind('currentColorPallet.itemHoverFrontColor');
     cursor: pointer;
 }
 
@@ -1041,7 +1049,7 @@ const isValidExport = computed(()=>{
     align-items: center;
     justify-content: center;
     background: v-bind('currentColorPallet.overlayBackColor');
-    color: v-bind('currentColorPallet?.frontColor');
+    color: v-bind('currentColorPallet.frontColor');
     inset: 0;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     overflow: hidden;
@@ -1057,7 +1065,7 @@ const isValidExport = computed(()=>{
     margin: 0;
     padding: 5px;
     background: v-bind('currentColorPallet.backColor2');
-    border: 2px solid v-bind('currentColorPallet?.borderColor');
+    border: 2px solid v-bind('currentColorPallet.borderColor');
     border-radius: var(--mdr-border-radius-size);
     overflow: hidden;
     display: flex;
@@ -1072,7 +1080,7 @@ const isValidExport = computed(()=>{
 
 .mdr-fullscreen-general-menu-frame {
     padding: 0px;
-    border-bottom: 1px solid v-bind('currentColorPallet?.borderColor');
+    border-bottom: 1px solid v-bind('currentColorPallet.borderColor');
 }
 
 
@@ -1091,7 +1099,7 @@ const isValidExport = computed(()=>{
     min-width: 64px;
     line-height: 25px;
     background: v-bind('currentColorPallet.backColor2');
-    border: 2px solid v-bind('currentColorPallet?.borderColor');
+    border: 2px solid v-bind('currentColorPallet.borderColor');
     border-radius: var(--mdr-border-radius-size);
     user-select: none;
 }
@@ -1099,14 +1107,14 @@ const isValidExport = computed(()=>{
 
 @media (hover: hover){
     .mdr-fullscreen-general-menu li:hover {
-        background: v-bind('currentColorPallet?.itemHoverBackColor');
-        color: v-bind('currentColorPallet?.itemHoverFrontColor');
+        background: v-bind('currentColorPallet.itemHoverBackColor');
+        color: v-bind('currentColorPallet.itemHoverFrontColor');
         cursor: pointer;
     }
 }
 .mdr-fullscreen-general-menu li:active {
-    background: v-bind('currentColorPallet?.itemHoverBackColor');
-    color: v-bind('currentColorPallet?.itemHoverFrontColor');
+    background: v-bind('currentColorPallet.itemHoverBackColor');
+    color: v-bind('currentColorPallet.itemHoverFrontColor');
     cursor: pointer;
 }
 
@@ -1121,7 +1129,7 @@ const isValidExport = computed(()=>{
 
 
 .mdr-fullscreen-diagram-title-frame{
-    border-bottom: 1px solid v-bind('currentColorPallet?.borderColor');
+    border-bottom: 1px solid v-bind('currentColorPallet.borderColor');
 }
 
 .mdr-fullscreen-diagram-title{
@@ -1129,7 +1137,7 @@ const isValidExport = computed(()=>{
     padding: 5px;
     background: var(--vp-code-block-bg);
     border-radius: var(--mdr-border-radius-size);
-    border: 2px solid v-bind('currentColorPallet?.borderColor2');
+    border: 2px solid v-bind('currentColorPallet.borderColor2');
     text-align: center;
 }
 
