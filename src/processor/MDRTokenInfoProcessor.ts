@@ -42,12 +42,19 @@ export function MDRTokenInfoProcessor(info: string, content: string): MDRTokenIn
         const encoded = encodeURIComponent(content)
         const highlightedHtml = highlightMermaidCode(content) // Shiki highlighterから直接ハイライト済みHTMLを生成
         const encodedHtml = encodeURIComponent(highlightedHtml)
-         
+        
+        let diagram_file_name = MCLSParser_getNamedParameterValue(parsed.namedParameters , "fn");
+        if(diagram_file_name.length==0)  diagram_file_name=MCLSParser_getNamedParameterValue(parsed.namedParameters , "filename");
+
+        if(diagram_file_name=="%title%") diagram_file_name = diagram_title;
+
         let tag = `<MermaidDiagramRenderer 
             code="${encoded}"
             highlighted-code="${encodedHtml}"
             startLineNumbers="${line_numbers}"
             title="${diagram_title_encoded}"`;
+
+        if(diagram_file_name.length!=0) tag += " filename=\""+encodeURIComponent(diagram_file_name)+"\""
 
         if(has_active_flag) tag+=" isCodeGroupFirstItem"
         

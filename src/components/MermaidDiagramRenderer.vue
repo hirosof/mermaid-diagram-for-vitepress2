@@ -29,6 +29,7 @@ const props = defineProps<{
     highlightedCode: string
     startLineNumbers: string
     title: string
+    filename?:string
     isCodeGroupFirstItem?: string
 }>()
 
@@ -309,7 +310,13 @@ function createMarkdownCodeBlockCode() : string{
 ------------------------------------------------------------------------
 */
 
+const TagSpecifiedFilename : string | null = (props.filename) ? decodeURIComponent(props.filename) : null;  
+
+
 function getDownloadFileNameBase() : string{
+
+    if(TagSpecifiedFilename) return TagSpecifiedFilename;
+    
     return DiagramID.value;
 }
 
