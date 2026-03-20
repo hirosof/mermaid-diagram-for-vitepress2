@@ -466,6 +466,8 @@ const EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen = ref<boolean|null>(nu
 const ShowCodeBlockLineNumbersForFullScreen = ref(ShowCodeBlockLineNumbers.value);
 
 function openFullScreen(contentType : 'Diagram'|'Code'){
+
+    document.removeEventListener('keydown' , FullScreenOnKeyDown);
     document.addEventListener('keydown' , FullScreenOnKeyDown); 
 
     if(EnableDrawAreaBaseSizeFitByDiagramSizeForFullScreen.value == null){
@@ -519,12 +521,12 @@ const FullScreenOnKeyDown = (event:KeyboardEvent) =>{
 
 watch(isDark, async () => {
     await nextTick()
-    onChangeTheme()
+    await onChangeTheme()
 })
 
-onMounted(() => {
+onMounted(async () => {
     isThisCodeGroupElement.value = (mdr_frame_container.value?.closest('.vp-code-group') ? true : false)
-    onChangeTheme();
+    await onChangeTheme();
 })
 
 onUnmounted(()=>{
