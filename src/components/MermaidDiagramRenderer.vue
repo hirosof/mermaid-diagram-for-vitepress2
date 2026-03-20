@@ -316,7 +316,7 @@ const TagSpecifiedFilename : string | null = (props.filename) ? decodeURICompone
 function getDownloadFileNameBase() : string{
 
     if(TagSpecifiedFilename) return TagSpecifiedFilename;
-    
+
     return DiagramID.value;
 }
 
@@ -646,7 +646,7 @@ const isValidExport = computed(()=>{
                     <div class="mdr-diagram-drawArea" v-html="DiagramData" ref="DiagramDrawTargetElement" v-if="isValidDiagramData" 
                         :class="{'mdr-diagram-drawArea-diagram-fit':EnableDrawAreaBaseSizeFitByDiagramSize}"/>
 
-                    <div class="mdr-diagram-drawArea" style="color:red" v-if="isValidDiagramData && (MermaidException.length>0)">
+                    <div class="mdr-diagram-drawArea" style="color:red" v-if="MermaidException.length>0">
                         Mermaid render error : {{ MermaidException }}
                     </div>
 
