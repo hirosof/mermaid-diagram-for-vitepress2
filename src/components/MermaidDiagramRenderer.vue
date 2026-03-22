@@ -603,7 +603,7 @@ const isValidExport = computed(()=>{
                 </div>
             </div>
 
-            <div class="mdr-operation-panel-frame" v-if="(currentContentType == 'Diagram')">
+            <div class="mdr-operation-panel-frame" v-if="(currentContentType == 'Diagram') && (MermaidException.length==0)">
 
 
                 <div class="mdr-operation-panel">
@@ -715,7 +715,7 @@ const isValidExport = computed(()=>{
                             行番号を{{ ShowCodeBlockLineNumbersForFullScreen ? '隠す' : '表示する'}}
                         </li>      
 
-                        <li @click="FullScreenContentType = (FullScreenContentType == 'Diagram') ? 'Code' : 'Diagram'">
+                        <li @click="FullScreenContentType = (FullScreenContentType == 'Diagram') ? 'Code' : 'Diagram'" v-if="(MermaidException.length==0)">
                             表示内容切替
                         </li>
 
