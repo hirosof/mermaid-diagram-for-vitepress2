@@ -22,7 +22,8 @@ import { ref, computed, onMounted, watch, nextTick,useId, onUnmounted } from 'vu
 import { useData } from 'vitepress'
 import { MDRDefaultConfig, type MDRConfigType } from '../config/MDRConfig'
 import mermaid from 'mermaid';
-import DOMPurify from 'dompurify'
+import DOMPurify from 'isomorphic-dompurify';
+
 
 // 属性の取得
 const props = defineProps<{
