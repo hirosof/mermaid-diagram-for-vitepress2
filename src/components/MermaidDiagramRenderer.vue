@@ -22,7 +22,7 @@ import { ref, computed, onMounted, watch, nextTick,useId, onUnmounted } from 'vu
 import { useData } from 'vitepress'
 import { MDRDefaultConfig, type MDRConfigType } from '../config/MDRConfig'
 import mermaid from 'mermaid';
-import DOMPurify from 'isomorphic-dompurify';
+import  DOMPurify from 'dompurify';
 
 
 // 属性の取得
@@ -44,6 +44,30 @@ const config = computed<MDRConfigType>(() => ({
     ...(theme.value.MDRConfig ?? {}),
 }))
 
+
+
+/*
+------------------------------------------------------------------------
+サニタイズ用関数
+------------------------------------------------------------------------
+*/
+
+function DOMPurifyWithoutSSR(src:string): string{
+    if(import.meta.env.SSR) return src;
+    return DOMPurify.sanitize(src , {
+        ADD_ATTR: ['style'],
+    });
+}
+
+function SVGDOMPurifyWithoutSSR(src:string): string{
+    if(import.meta.env.SSR) return src;
+    return DOMPurify.sanitize(src , {
+        USE_PROFILES:{svg:true , svgFilters:true},
+        ADD_TAGS: ['foreignObject', 'div', 'span', 'br'], 
+        ADD_ATTR: ['xmlns'],
+        HTML_INTEGRATION_POINTS: { 'foreignobject': true }            
+    });
+}
 
 /*
 ------------------------------------------------------------------------
@@ -166,9 +190,8 @@ async function onChangeTheme() {
 /*
     ハイライト済みMermaidコード
 */
-const MermaidHighlightedCode = DOMPurify.sanitize(decodeURIComponent(props.highlightedCode), {
-    ADD_ATTR: ['style']
-});
+const MermaidHighlightedCode = DOMPurifyWithoutSSR(decodeURIComponent(props.highlightedCode));
+
 
 /*
 
@@ -227,13 +250,8 @@ async function renderDiagram() {
         const data = await mermaid.render(DiagramID.value, MermaidCode);
         MermaidException.value = ""
 
-        const sanitized = DOMPurify.sanitize(data.svg , {
-            USE_PROFILES:{svg:true , svgFilters:true},
-            ADD_TAGS: ['foreignObject', 'div', 'span', 'br'], 
-            ADD_ATTR: ['xmlns'],
-            HTML_INTEGRATION_POINTS: { 'foreignobject': true }            
-        });
-
+        const sanitized = SVGDOMPurifyWithoutSSR(data.svg);
+    
         DiagramData.value = sanitized;
 
         DiagramSize.value = getSVGSize(data.svg , null) || undefined;
