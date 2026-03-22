@@ -1,4 +1,5 @@
 {
+  "private": true,
   "name": "mermaid-diagram-for-vitepress2",
   "version": "0.1.0",
   "description": "VitePress 2用のMermaid図描画コンポーネント",
