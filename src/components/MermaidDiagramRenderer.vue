@@ -22,6 +22,7 @@ import { ref, computed, onMounted, watch, nextTick,useId, onUnmounted } from 'vu
 import { useData } from 'vitepress'
 import { MDRDefaultConfig, type MDRConfigType } from '../config/MDRConfig'
 import mermaid from 'mermaid';
+import DOMPurify from 'dompurify'
 
 // 属性の取得
 const props = defineProps<{
@@ -164,7 +165,9 @@ async function onChangeTheme() {
 /*
     ハイライト済みMermaidコード
 */
-const MermaidHighlightedCode = decodeURIComponent(props.highlightedCode);
+const MermaidHighlightedCode = DOMPurify.sanitize(decodeURIComponent(props.highlightedCode), {
+    ADD_ATTR: ['style']
+});
 
 /*
 
@@ -222,7 +225,16 @@ async function renderDiagram() {
     try {
         const data = await mermaid.render(DiagramID.value, MermaidCode);
         MermaidException.value = ""
-        DiagramData.value = data.svg
+
+        const sanitized = DOMPurify.sanitize(data.svg , {
+            USE_PROFILES:{svg:true , svgFilters:true},
+            ADD_TAGS: ['foreignObject', 'div', 'span', 'br'], 
+            ADD_ATTR: ['xmlns'],
+            HTML_INTEGRATION_POINTS: { 'foreignobject': true }            
+        });
+
+        DiagramData.value = sanitized;
+
         DiagramSize.value = getSVGSize(data.svg , null) || undefined;
     } catch (e) {
         MermaidException.value = `${e}`;
